@@ -1,0 +1,63 @@
+.nav a {
+	  color: #5a5a5a;
+	  font-size: 11px;
+	  font-weight: bold;
+	  padding: 14px 10px;
+	  text-transform: uppercase;
+}
+
+.nav li {
+	display: inline;
+}
+
+.nav li a {
+	color: white;
+}
+
+.header-img {
+	height:auto; 
+	width:auto; 
+	max-width:15.5px; 
+	max-height:15.5px;
+}
+
+.jumbotron {
+	background-image:url("../img/darkBackground.jpg");
+	height: 200px;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.jumbotron .container {
+	  position: relative;
+	  top:10px;
+}
+
+.jumbotron h1 {
+	  color: #fff;
+	  font-size: 48px;  
+	  font-family: 'Shift', sans-serif;
+	  font-weight: bold;
+}
+
+.jumbotron p {
+	  font-size: 20px;
+	  color: #fff;
+}
+
+.learn-more h3 {
+	font-family: 'Shift', sans-serif;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.badge {
+	background-color: #000000;
+	font-weight: normal;
+}
+
+
+
+.learn-more a {
+	color: #00b0ff;
+}
