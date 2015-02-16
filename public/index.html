@@ -1,0 +1,52 @@
+<html>
+	<head lang="en">
+		<meta charset="UTF-8">
+		<title>Inventory Management</title>
+		<base href="/">
+		
+		<!--  Stylesheets  -->
+		<link rel = "stylesheet" href = "css/bootstrap.css">
+		<link rel = "stylesheet" href = "css/main.css">
+		
+		<!--  Javascript imports -->
+		<script src="libs/angular/angular.js"></script>
+		<script src="libs/angular-route/angular-route.min.js"></script>
+	
+		<!--  Angular imports -->
+		<script src = "js/app.js"></script>
+		<script src = "js/appRoutes.js"></script>
+		<script src = "js/controllers/home.control.js"></script>
+		<script src = "js/controllers/query.control.js"></script>
+		
+		<!--
+		<script src = "js/controllers/add.control.js"></script>
+		<script src = "js/services/add.service.js"></script>
+		-->
+	</head>
+
+	<body>
+		<div class="navbar-fixed-top">
+			<div class="container">
+				<ul class="nav nav-pills">
+					<li><a href="/">Home</a></li>
+					<li><a href="/query">Inventory Query</a></li>
+					<li><a href="invenAdd.html">Add Inventory</a></li>
+					<li><a href="#">Remove Inventory</a></li>
+					<li><a href="#">About</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="jumbotron">
+			<div class="container">
+				<h1>Inventory Management</h1>
+				<p>Monitor and Manage Essential Inventory</p>
+			</div>
+		</div> 
+
+		<!-- ANGULAR DYNAMIC CONTENT -->
+		<div ng-app="InventoryApplication" ng-controller = "HomeController">
+			<div ng-view></div>
+		</div>
+	</body>
+</html>

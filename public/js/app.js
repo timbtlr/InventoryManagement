@@ -1,0 +1,1 @@
+angular.module('InventoryApplication', ['ngRoute', 'appRoutes', 'HomeCtrl', 'QueryCtrl']);

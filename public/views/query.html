@@ -1,0 +1,26 @@
+<div class = "container" ng-controller="QueryController as main">
+	<h1>{{main.title}}</h1>
+	
+	<div class = "col-sm-3">
+		<h3>Search for an Item</h3>
+		<div class="input-group">
+			<span class="input-group-addon">
+				<span class="search"></span>
+			</span>
+			<input type="text" class="form-control" ng-model="main.searchInput">
+		</div>
+	</div>
+	<div class="col-md-9">
+		<h3>Inventory Items</h3>
+		<div class = "output-group">
+			<ul class="list-group">
+				<li class="list-group-item" ng-repeat="item in main.items | filter:main.searchInput | orderBy:main.order.key:main.order.reverse">{{item.itemName}} 
+					<span class="badge">Number: {{item.itemNumber}}</span>
+					<span class="badge">Quantity: {{item.quantity}}</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	
+	<select class="form-control pull-right" ng-model="main.order" ng-options="order as order.title for order in main.orders"></select>
+</div>
