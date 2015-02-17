@@ -56,7 +56,13 @@
 	font-weight: normal;
 }
 
+::-webkit-scrollbar { display:none }
 
+.list-group {
+    height: 500px;
+	overflow: scroll;
+    overflow-x: hidden;
+}
 
 .learn-more a {
 	color: #00b0ff;
