@@ -1,1 +1,1 @@
-angular.module('InventoryApplication', ['ngRoute', 'appRoutes', 'HomeCtrl', 'QueryCtrl']);
+angular.module('InventoryApplication', ['ngRoute', 'appRoutes', 'HomeCtrl', 'QueryCtrl', 'QueryService']);

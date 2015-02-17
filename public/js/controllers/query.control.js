@@ -1,40 +1,20 @@
-angular.module('QueryCtrl', []).controller('QueryController', function($scope){
+angular.module('QueryCtrl', []).controller('QueryController', function($scope, queryServiceFactory){
     var vm = this;
     vm.title = "Current Inventory on File";
     vm.searchInput = '';
 	
-	vm.items = [
-        {	
-			itemName: 'Item 1',
-			itemNumber: 1,
-            favorite: true,
-            quantity: 2011,
-        }	,
-		{
-            itemName: 'Item 2',
-			itemNumber: 2,
-            quantity: 2010,
-            favorite: false
-        },
-        {
-            itemName: 'Item 3',
-			itemNumber: 3,
-            quantity: 2002,
-            favorite: true
-        },
-        {
-            itemName: 'Item 4',
-			itemNumber: 4,
-            quantity: 2013,
-            favorite: true
-        },
-        {
-            itemName: 'Item 5',
-			itemNumber: 5,
-            quantity: 2005,
-            favorite: false
-        }
-    ];
+	vm.items = [];
+	queryServiceFactory.get().then(function(result) {
+		vm.items = result.data;
+	});
+	
+	console.log(vm.items.length)
+	
+	if (vm.items.length == 0) {
+		vm.items = [{name: 'No items found.'}]
+	}
+	
+	console.log(vm.items);
 	
 	vm.orders = [
     {

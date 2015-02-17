@@ -12,16 +12,17 @@
 		<script src="libs/angular/angular.js"></script>
 		<script src="libs/angular-route/angular-route.min.js"></script>
 	
-		<!--  Angular imports -->
+		<!--  Angular Application Setup -->
 		<script src = "js/app.js"></script>
 		<script src = "js/appRoutes.js"></script>
+		
+		<!--  Angular Services -->
+		<script src = "js/services/query.service.js"></script>
+		
+		<!--  Angular Controllers -->
 		<script src = "js/controllers/home.control.js"></script>
 		<script src = "js/controllers/query.control.js"></script>
 		
-		<!--
-		<script src = "js/controllers/add.control.js"></script>
-		<script src = "js/services/add.service.js"></script>
-		-->
 	</head>
 
 	<body>
@@ -30,7 +31,7 @@
 				<ul class="nav nav-pills">
 					<li><a href="/">Home</a></li>
 					<li><a href="/query">Inventory Query</a></li>
-					<li><a href="invenAdd.html">Add Inventory</a></li>
+					<li><a href="#">Add Inventory</a></li>
 					<li><a href="#">Remove Inventory</a></li>
 					<li><a href="#">About</a></li>
 				</ul>
@@ -45,7 +46,7 @@
 		</div> 
 
 		<!-- ANGULAR DYNAMIC CONTENT -->
-		<div ng-app="InventoryApplication" ng-controller = "HomeController">
+		<div ng-app="InventoryApplication">
 			<div ng-view></div>
 		</div>
 	</body>

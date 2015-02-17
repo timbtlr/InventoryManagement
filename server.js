@@ -4,28 +4,28 @@ var app            	= express();
 var bodyParser     	= require('body-parser');
 var methodOverride 	= require('method-override');
 var mongoose 		= require('mongoose');
+var db 				= require('./config/db');  //  Database configuration
 
 // Use bodyParser() to get information from POST
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); 
-
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(methodOverride('X-HTTP-Method-Override')); 
+app.use(express.static(__dirname + '/public')); 
 
 // CONFIGURATION ===========================================
-var db = require('./config/db');
 
 // connect to our mongoDB database 
 mongoose.connect('mongodb://invenuser:invenpassword@ds045021.mongolab.com:45021/inventory'); 
-app.use(methodOverride('X-HTTP-Method-Override')); 
-
 
 // ROUTES ==================================================
-require('./app/routes/inventory.model.route')(app); // configure our routes
+var router = express.Router();         
+require('./app/routes/inventory.model.route')(router); // configure routes for the inventory model
+app.use('/api', router);
 
+require('./app/routes/routes')(app); // configure our routes
 
 // set the static files location /public/img will be /img for users
-app.use(express.static(__dirname + '/public')); 
-
 
 // START APPLICATION =====================================
 // startup our app at http://localhost:8080
