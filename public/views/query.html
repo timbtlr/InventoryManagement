@@ -9,6 +9,11 @@
 			</span>
 			<input type="text" class="form-control" ng-model="main.searchInput">
 		</div>
+		<br/>
+		<br/>
+		<div>
+			<select class="form-control pull-right" ng-model="main.order" ng-options="order as order.title for order in main.orders"></select>
+		</div>
 	</div>
 	<div class="col-md-9">
 		<h3>Inventory Items</h3>
@@ -22,5 +27,5 @@
 		</div>
 	</div>
 	
-	<select class="form-control pull-right" ng-model="main.order" ng-options="order as order.title for order in main.orders"></select>
+	
 </div>
