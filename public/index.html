@@ -1,3 +1,19 @@
+<!--
+Name:
+	index.html
+	
+Description:
+	Main InventoryManagement application landing page.  The contents of this page are displayed for each section of the
+	application.  Each application view is loaded into the ng-view div at the bottom of the page.
+	
+	This page contains the application navigation bar, the page headers, and general structure of the application.
+	Each view will contain their own elements as necessary.  This page/view does not require a service as APIs are
+	not necessary for full page activity.  
+
+Author:
+	Tim "KetsuN" Butler
+-->
+
 <html>
 	<head lang="en">
 		<meta charset="UTF-8">
@@ -26,6 +42,7 @@
 	</head>
 
 	<body>
+		<!--  Navigation bar for the InventoryManagement application -->
 		<div class="navbar-fixed-top">
 			<div class="container">
 				<ul class="nav nav-pills">
@@ -38,6 +55,7 @@
 			</div>
 		</div>
 
+		<!--  Header and subheading for the main application landing -->
 		<div class="jumbotron">
 			<div class="container">
 				<h1>Inventory Management</h1>
@@ -45,7 +63,7 @@
 			</div>
 		</div> 
 
-		<!-- ANGULAR DYNAMIC CONTENT -->
+		<!-- Angular dynamic content is loaded beyond this point -->
 		<div ng-app="InventoryApplication">
 			<div ng-view></div>
 		</div>
