@@ -10,4 +10,4 @@ Author:
 	Tim "KetsuN" Butler
 */
 
-angular.module('InventoryApplication', ['ngRoute', 'appRoutes', 'HomeCtrl', 'QueryCtrl', 'QueryService', 'AddCtrl', 'AddService']);
+angular.module('InventoryApplication', ['ui.bootstrap', 'ngRoute', 'appRoutes', 'HomeCtrl', 'QueryCtrl', 'QueryService', 'AddCtrl', 'AddService']);

@@ -15,14 +15,22 @@
 			<select class="form-control pull-right" ng-model="main.order" ng-options="order as order.title for order in main.orders"></select>
 		</div>
 	</div>
+	
 	<div class="col-md-9">
 		<h3>Inventory Items</h3>
 		<div class = "output-group">
 			<ul class="list-group">
-				<li class="list-group-item" ng-repeat="item in main.items | filter:main.searchInput | orderBy:main.order.key:main.order.reverse">
+				<li class="list-group-item" ng-repeat="item in main.items | filter:main.searchInput | orderBy:main.order.key:main.order.reverse" ng-click="expand(item)">
 					{{item.partNumber}} : {{item.desc}}
-					<span class="badge">Cost: ${{item.cost}}</span>
 					<span class="badge">Quantity: {{item.quantity}}</span>
+					<span class="badge">Cost: ${{item.cost}}</span>
+					<li ng-show="item.show">
+						<ul>
+							<li ng-repeat="child in item.children">
+								<span> Something goes here </span>
+							</li>
+						</ul>  
+					</li>
 				</li>
 			</ul>
 		</div>

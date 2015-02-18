@@ -38,7 +38,6 @@ module.exports = function(router) {
 			inventory.quantity = req.body.quantity;
 			inventory.uom = req.body.uom;
 			inventory.cost = req.body.cost;
-			inventory.children = req.body.children;
 
 			// Save the item in the inventory document
 			inventory.save(function(err) {

@@ -1,3 +1,7 @@
+.panel-body{
+    padding : 0px;
+}
+
 .nav a {
 	  color: #5a5a5a;
 	  font-size: 11px;

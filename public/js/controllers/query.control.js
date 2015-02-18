@@ -17,6 +17,11 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, q
     vm.title = "Current Inventory on File";
     vm.searchInput = '';
 	
+	vm.expand = function(vote) {
+		console.log("Trying to expand")
+	   item.show = !vote.show;
+	}
+	
 	//  Ordering definitions for database results
 	vm.orders = [{id: 1,title: 'Part Number Ascending',key: 'partNumber',reverse: false},
     			 {id: 2,title: 'Part Number Descending',key: 'partNumber',reverse: true},
