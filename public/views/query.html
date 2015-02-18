@@ -28,14 +28,14 @@
 		<h3>Inventory Items</h3>
 		<div class = "output-group">
 			<ul class="list-group">
-				<li class="list-group-item" ng-repeat="item in main.items | filter:{partNumber:main.searchInput} | orderBy:main.order.key:main.order.reverse" ng-click="main.expand(item)">
+				<li class="list-group-item" ng-repeat="item in main.parts | filter:{partNumber:main.searchInput} | orderBy:main.order.key:main.order.reverse" ng-click="main.expand(item)">
 					{{item.partNumber}} : {{item.desc}}
 					<span class="badge" ng-show="main.badgeShow">Quantity: {{item.quantity}}</span>
 					<span class="badge" ng-show="main.badgeShow">Cost: ${{item.cost}}</span>
 					<ul class="list-group" ng-show="item.show">
 						<li class="list-group-item" ng-repeat="child in item.children">
 							{{child.partNumber}} : {{child.desc}}
-							<span class="badge">Quantity: {{child.quantity}}</span>
+							<span class="badge">Parts per item: {{child.ppi}}</span>
 							<span class="badge">Cost: ${{child.cost}}</span>
 						</li>
 					</ul>  
