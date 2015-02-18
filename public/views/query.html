@@ -14,23 +14,31 @@
 		<div>
 			<select class="form-control pull-right" ng-model="main.order" ng-options="order as order.title for order in main.orders"></select>
 		</div>
+		<br/>
+		<br/>
+		<br/>
+		<div>
+			<p>
+				Search for a part number using the search box.  Click a part row to show the part makeup.
+			</p>
+		</div>
 	</div>
 	
 	<div class="col-md-9">
 		<h3>Inventory Items</h3>
 		<div class = "output-group">
 			<ul class="list-group">
-				<li class="list-group-item" ng-repeat="item in main.items | filter:main.searchInput | orderBy:main.order.key:main.order.reverse" ng-click="expand(item)">
+				<li class="list-group-item" ng-repeat="item in main.items | filter:{partNumber:main.searchInput} | orderBy:main.order.key:main.order.reverse" ng-click="main.expand(item)">
 					{{item.partNumber}} : {{item.desc}}
-					<span class="badge">Quantity: {{item.quantity}}</span>
-					<span class="badge">Cost: ${{item.cost}}</span>
-					<li ng-show="item.show">
-						<ul>
-							<li ng-repeat="child in item.children">
-								<span> Something goes here </span>
-							</li>
-						</ul>  
-					</li>
+					<span class="badge" ng-show="main.badgeShow">Quantity: {{item.quantity}}</span>
+					<span class="badge" ng-show="main.badgeShow">Cost: ${{item.cost}}</span>
+					<ul class="list-group" ng-show="item.show">
+						<li class="list-group-item" ng-repeat="child in item.children">
+							{{child.partNumber}} : {{child.desc}}
+							<span class="badge">Quantity: {{child.quantity}}</span>
+							<span class="badge">Cost: ${{child.cost}}</span>
+						</li>
+					</ul>  
 				</li>
 			</ul>
 		</div>
