@@ -32,15 +32,21 @@ module.exports = function(router) {
 		.post(function(req, res) {
 			//  Instantiate a new Inventory object with proper item field values
 			var inventory = new Inventory(); 
-			inventory.name = req.body.name;  //  Item name
-			inventory.id = req.body.id;  	 //  Item ID
-			inventory.desc = req.body.desc;  //  Item description
+			
+			inventory.partNumber = req.body.partNumber;
+			inventory.desc = req.body.desc;
+			inventory.quantity = req.body.quantity;
+			inventory.uom = req.body.uom;
+			inventory.cost = req.body.cost;
+			inventory.children = req.body.children;
 
 			// Save the item in the inventory document
 			inventory.save(function(err) {
 				//  Check for and report errors
 				if (err)
 					res.send(err);
+				
+				res.json({ message: 'Inventory item created!' });
 			});
 		})
 		 
@@ -90,6 +96,9 @@ module.exports = function(router) {
 						//  Check for and report update errors
 						if (err)
 							res.send(err);
+						
+						
+						res.json({ message: 'Inventory item modified!' });
 					});
 				}
 			});

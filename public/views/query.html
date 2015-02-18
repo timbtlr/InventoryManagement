@@ -19,13 +19,12 @@
 		<h3>Inventory Items</h3>
 		<div class = "output-group">
 			<ul class="list-group">
-				<li class="list-group-item" ng-repeat="item in main.items | filter:main.searchInput | orderBy:main.order.key:main.order.reverse">{{item.name}} 
-					<!--<span class="badge">Number: {{item.itemNumber}}</span>
-					<span class="badge">Quantity: {{item.quantity}}</span>-->
+				<li class="list-group-item" ng-repeat="item in main.items | filter:main.searchInput | orderBy:main.order.key:main.order.reverse">
+					{{item.partNumber}} : {{item.desc}}
+					<span class="badge">Cost: ${{item.cost}}</span>
+					<span class="badge">Quantity: {{item.quantity}}</span>
 				</li>
 			</ul>
 		</div>
 	</div>
-	
-	
 </div>

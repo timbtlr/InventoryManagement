@@ -22,9 +22,11 @@ var Schema = mongoose.Schema;
 
 // Define the Inventory model schema
 var InventorySchema  = new Schema({
-    name: String,
-	id: Number,
+	partNumber: String,
 	desc: String,
+	quantity: Number,
+	uom: String,
+	cost: Number,
 	children: Array
 });
 

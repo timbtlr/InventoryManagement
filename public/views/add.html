@@ -1,0 +1,53 @@
+<div class="container" ng-controller="AddController as main">
+	<div class = "container">
+		<h1>{{main.title}}</h1>
+		
+		<div class="clearfix"></div>
+		<h3>Add Items to Inventory</h3>
+		<form name="main.addForm" class="form">
+		
+			<div class="row">
+				<div class = "col-sm-3">
+					<div class="form-group">
+						<label>Item ID</label>
+						<input type="text" class="form-control" ng-model="main.new.id" required />
+					</div>
+				</div>
+				<div class = "col-sm-6">
+					<div class="form-group">
+						<label>Description</label>
+						<input type="text" class="form-control" ng-model="main.new.description" required />
+					</div>
+				</div>
+			</div>
+			<div class = "row">
+				<div class = "col-sm-3">
+					<div class="form-group">
+						<label>Quantity</label>
+						<input type="text" class="form-control" ng-model="main.new.quantity" required />
+					</div>
+				</div>
+				<div class = "col-sm-3">
+					<div class="form-group">
+						<label>Cost</label>
+						<input type="text" class="form-control" ng-model="main.new.cost" required />
+					</div>
+				</div>
+				<div class = "col-sm-3">
+					<div class="form-group">
+						<label>UOM</label>
+						<input type="text" class="form-control" ng-model="main.new.uom" required />
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-3">
+					<label><input type="checkbox" ng-model="main.new.otherParts" />Made of Other Parts</label>
+				</div>
+				<div class="col-sm-6">
+					<button class="btn btn-success pull-right"><span class="glyphicon glyphicon-plus-sign"></span> Add</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

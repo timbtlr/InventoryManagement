@@ -1,3 +1,6 @@
-angular.module('AddCtrl', []).controller('AddController', function($scope) {
-    $scope.tagline = 'Nothing beats a pocket protector!';
+
+angular.module('AddCtrl', []).controller('AddController', function($scope, queryServiceFactory) {
+    var vm = this;
+    vm.title = "Add Items to Inventory";
+    vm.searchInput = '';
 });

@@ -17,22 +17,23 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, q
     vm.title = "Current Inventory on File";
     vm.searchInput = '';
 	
+	//  Ordering definitions for database results
+	vm.orders = [{id: 1,title: 'Part Number Ascending',key: 'partNumber',reverse: false},
+    			 {id: 2,title: 'Part Number Descending',key: 'partNumber',reverse: true},
+    			 {id: 3,title: 'Cost Ascending',key: 'cost',reverse: false},
+    			 {id: 4,title: 'Cost Descending',key: 'cost',reverse: true},
+    			 {id: 3,title: 'Quantity Ascending',key: 'quantity',reverse: false},
+    			 {id: 4,title: 'Quantity Descending',key: 'quantity',reverse: true}];
+	vm.order = vm.orders[0];
+	
+	//  Retrieve all inventory results from the database
 	vm.items = [];
 	queryServiceFactory.get().then(function(result) {
 		vm.items = result.data;
 	});
 	
-	console.log(vm.items.length)
-	
+	//  If no results were found then report that fact
 	if (vm.items.length == 0) {
 		vm.items = [{name: 'No items found.'}]
 	}
-	
-	console.log(vm.items);
-	
-	vm.orders = [{id: 1,title: 'Name Ascending',key: 'itemName',reverse: false},
-    			 {id: 2,title: 'Name Descending',key: 'itemName',reverse: true},
-    			 {id: 3,title: 'Item Number Ascending',key: 'itemNumber',reverse: false},
-    			 {id: 4,title: 'Item Number Ascending',key: 'itemNumber',reverse: true}];
-	vm.order = vm.orders[0];
 });
