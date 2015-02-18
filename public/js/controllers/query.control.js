@@ -22,12 +22,12 @@ calculateQuantity = function (partArray) {
 		var part = partArray[i];
 		
 		if (part.children.length != 0) {
-			var minQuantity = 999999;
+			var minQuantity = null;
 			
 			for (j = 0; j < part.children.length; j++) {
 				var child = part.children[j];
 				var tempQuantity = lookup[child.partNumber].quantity / child.ppi; 
-				if (tempQuantity < minQuantity) {
+				if ((tempQuantity < minQuantity) || (minQuantity == null)) {
 					minQuantity = tempQuantity
 				}
 			}
