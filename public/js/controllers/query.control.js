@@ -12,6 +12,31 @@ Author:
 	Tim "KetsuN" Butler
 */
 
+calculateQuantity = function (partArray) {
+	var lookup = {};
+	for (var i = 0, len = partArray.length; i < len; i++) {
+		lookup[partArray[i].partNumber] = partArray[i];
+	}
+	
+	for (i = 0; i < partArray.length; i++) {
+		var part = partArray[i];
+		
+		if (part.children.length != 0) {
+			var minQuantity = 999999;
+			
+			for (j = 0; j < part.children.length; j++) {
+				var child = part.children[j];
+				var tempQuantity = lookup[child.partNumber].quantity / child.ppi; 
+				if (tempQuantity < minQuantity) {
+					minQuantity = tempQuantity
+				}
+			}
+				
+			part.quantity = minQuantity;
+		}
+	}
+}
+
 angular.module('QueryCtrl', []).controller('QueryController', function($scope, queryServiceFactory) {
     var vm = this;
     vm.title = "Current Inventory on File";
@@ -33,150 +58,27 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, q
 		vm.items = result.data;
 	});*/
 	
-	vm.items = [{partNumber: "STARTERFL106", 
+	vm.parts = [{partNumber: "PartA", 
 				 desc: "This is some item!", 
 				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "FFB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "FFBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "XX106", 
+				 quantity:0, 
+				 children: [{partNumber: "PartB", desc: "This is some item!", cost:25.23, ppi:2}, {partNumber: "PartC", desc: "This is some item!", cost:25.23, ppi:3}]},
+				 {partNumber: "PartB", 
 				 desc: "This is some item!", 
 				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "XXB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "XXBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "YY106", 
+				 quantity:18, 
+				 children: []},
+				 {partNumber: "PartC", 
 				 desc: "This is some item!", 
 				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "YYB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "YYBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "ZZ106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "ZZB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "ZZBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "FL106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "FFB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "FFBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "XX106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "XXB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "XXBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "YY106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "YYB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "YYBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "ZZ106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "ZZB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "ZZBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "FL106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "FFB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "FFBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "XX106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "XXB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "XXBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "YY106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "YYB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "YYBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "ZZ106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "ZZB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "ZZBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "FL106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "FFB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "FFBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "XX106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "XXB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "XXBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "YY106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "YYB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "YYBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "ZZ106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "ZZB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "ZZBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "FL106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "FFB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "FFBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "XX106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "XXB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "XXBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "YY106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "YYB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "YYBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "ZZ106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "ZZB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "ZZBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "FL106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "FFB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "FFBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "XX106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "XXB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "XXBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "YY106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "YYB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "YYBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "ZZ106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "ZZB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "ZZBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "FL106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "FFB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "FFBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "XX106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "XXB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "XXBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "YY106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "YYB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "YYBC106", desc: "This is some item!", cost:25.23, quantity:14}]},
-				 {partNumber: "ZZ106", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:14, 
-				 children: [{partNumber: "ZZB106", desc: "This is some item!", cost:25.23, quantity:14}, {partNumber: "ZZBC106", desc: "This is some item!", cost:25.23, quantity:14}]}]
+				 quantity:6, 
+				 children: []}]
+				 
+	calculateQuantity (vm.parts);
 	
 	//  If no results were found then report that fact
-	if (vm.items.length == 0) {
-		vm.items = [{partNumber: 'No parts found.', desc: "Enter parts in the add inventory section to see them here"}]
+	if (vm.parts.length == 0) {
+		vm.parts = [{partNumber: 'No parts found.', desc: "Enter parts in the add inventory section to see them here"}]
 		vm.badgeShow = false;
 	} else {
 		vm.badgeShow = true;
