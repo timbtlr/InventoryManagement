@@ -12,10 +12,15 @@
 
 .nav li {
 	display: inline;
+	
 }
 
 .nav li a {
 	color: white;
+}
+
+.nav li a{
+	background-color: #32485E;
 }
 
 .header-img {
@@ -66,6 +71,25 @@
     height: 500px;
 	overflow: scroll;
     overflow-x: hidden;
+	padding-right: 0px;
+}
+
+.list-group  .list-group {
+	margin-top: 10px;
+	margin-right: -14px;
+	height: auto;
+}
+
+.list-group .list-group .list-group-item {
+	background-color: #32485E;
+	margin-right: -14px;
+	padding-right: 27px;
+}
+
+
+.list-group .list-group .list-group-item .badge {
+	background-color: #1B2F44;
+	font-weight: normal;
 }
 
 .learn-more a {
