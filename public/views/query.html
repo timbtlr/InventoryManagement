@@ -32,10 +32,13 @@
 					{{item.partNumber}} : {{item.desc}}
 					<span class="badge" ng-show="main.badgeShow">Quantity: {{item.quantity}}</span>
 					<span class="badge" ng-show="main.badgeShow">Cost: ${{item.cost}}</span>
+					<span class="badge hadChildrenBadge" ng-show="item.children.length > 0">Contains {{item.children.length}} parts</span>
+					<span class="badge" ng-show="item.children.length == 0">UOM: {{item.uom}}</span>
 					<ul class="list-group" ng-show="item.show">
 						<li class="list-group-item" ng-repeat="child in item.children">
 							{{child.partNumber}} : {{child.desc}}
-							<span class="badge">Parts per item: {{child.ppi}}</span>
+							<span class="badge">Parts per Item: {{child.ppi}}</span>
+							<span class="badge">Quantity: {{child.quantity}}</span>
 							<span class="badge">Cost: ${{child.cost}}</span>
 						</li>
 					</ul>  
