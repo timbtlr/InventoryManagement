@@ -92,6 +92,31 @@
 	font-weight: normal;
 }
 
+select.input-sm {
+	color: #000000;
+	font-size: 14px;
+	width: 260px;
+	height: 38px;
+}
+
+.hadChildrenBadge {
+	background-color: #32485E;
+}
+
+.removeBadge {
+	background-color: #C3533F;
+	color: white;
+	font-weight: bold;
+}
+
+.childListGroup {
+	height: auto;
+}
+
+.addChildButton {
+	margin-top: 25px;
+}
+
 .learn-more a {
 	color: #00b0ff;
 }
