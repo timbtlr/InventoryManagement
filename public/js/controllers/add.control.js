@@ -1,5 +1,5 @@
 
-angular.module('AddCtrl', []).controller('AddController', function($scope, queryServiceFactory) {
+angular.module('AddCtrl', []).controller('AddController', function($scope, $interval, addServiceFactory) {
     var vm = this;
     vm.title = "Add Items to Inventory";
     vm.searchInput = '';
@@ -17,22 +17,6 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, query
 					 {name:"Square Inches", abbr:"SI"},
 					 {name:"Linear Feet", abbr:"LFT"},
 					 {name:"Linear Yard", abbr:"LYD"},]
-					 
-	vm.parts = [{partNumber: "PartA", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:0, 
-				 children: [{partNumber: "PartB", desc: "This is some item!", cost:25.23, ppi:2}, {partNumber: "PartC", desc: "This is some item!", cost:25.23, ppi:3}]},
-				 {partNumber: "PartB", 
-				 desc: "This is some item!", 
-				 cost:4.75, 
-				 quantity:18, 
-				 children: []},
-				 {partNumber: "PartC", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:47, 
-				 children: []}]
 				 
 	vm.addChildToPart = function (newChild, newPpi) {
 		var newChildRecord = {partNumber: newChild.partNumber,
@@ -44,6 +28,16 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, query
 		vm.childrenToAdd.push(newChildRecord)
 	}
 	
+	//  Retrieve all inventory results from the database
+	addServiceFactory.get().then(function(result) {
+		vm.parts = result.data;
+		
+		
+		//  If no inventory results were found then report that fact
+		if (vm.parts.length == 0) {
+			vm.parts = [{partNumber: 'No parts found', desc: "Enter parts in the add inventory section to see them here"}]
+		}
+	});
 	
 	vm.removeChildFromPart = function (newChild) {
 		for (i = 0; i < vm.childrenToAdd.length; i ++) {
@@ -52,5 +46,17 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, query
 				return;
 			}
 		}
+	}
+	
+	vm.addPartToInventory = function () {
+		var newPart = {partNumber: $scope.newPartNumber, 
+					   desc: $scope.newDescription, 
+					   quantity: $scope.newQuantity, 
+					   cost: $scope.newCost, 
+					   uom: $scope.newUomSelect.abbr}
+		
+		addServiceFactory.post(newPart).then(function(result) {
+			console.log("Added new part!")
+		});
 	}
 });

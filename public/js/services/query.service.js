@@ -13,7 +13,7 @@ Author:
 
 angular.module('QueryService', []).factory('queryServiceFactory', ['$http', function($http) {
     return {
-        // call to get all nerds
+        // call to get all inventory parts
         get : function() {
             return $http.get('/api/inventory');
         }

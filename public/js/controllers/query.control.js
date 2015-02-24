@@ -26,7 +26,7 @@ Description:
 Author:
 	Tim "KetsuN" Butler
 */
-angular.module('QueryCtrl', []).controller('QueryController', function($scope, queryServiceFactory) {
+angular.module('QueryCtrl', []).controller('QueryController', function($scope, $interval, queryServiceFactory) {
     var vm = this;
     vm.title = "Current Inventory on File";
     vm.searchInput = '';
@@ -41,47 +41,34 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, q
     			 {id: 4,title: 'Quantity Descending',key: 'quantity',reverse: true}];
 	vm.order = vm.orders[0];
 	
-	//  Retrieve all inventory results from the database
-	/*vm.items = [];
-	queryServiceFactory.get().then(function(result) {
-		vm.items = result.data;
-	});*/
-	
-	vm.parts = [{partNumber: "PartA", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:0, 
-				 children: [{partNumber: "PartB", desc: "This is some item!", ppi:0.67}, {partNumber: "PartC", desc: "This is some item!", ppi:1}]},
-				 {partNumber: "PartB", 
-				 desc: "This is some item!", 
-				 cost:4.75, 
-				 quantity:18,
-				 uom: "EA",
-				 children: []},
-				 {partNumber: "PartC", 
-				 desc: "This is some item!", 
-				 cost:25.23, 
-				 quantity:47,
-				 uom: "SFT",
-				 children: []}]
-	
-	//  If no inventory results were found then report that fact
-	if (vm.parts.length == 0) {
-		vm.parts = [{partNumber: 'No parts found.', desc: "Enter parts in the add inventory section to see them here"}]
-		vm.badgeShow = false;
-	} else { 
-		//  Inventory database results were found
-		//  Calculate the quantity and cost of each item in the database.
-		//  Quantities and costs are calculated outside of storage because some parts are comprised of other parts.
-		calculateQtyAndCost (vm.parts);
-		vm.badgeShow = true;
-	}
-	
 	//  Function used to expand/collapse a part containing children
 	vm.expand = function(item) {
 		if (item.children.length > 0){
 			item.show = !item.show;
 		}
+	}
+	
+	//  Retrieve all inventory results from the database
+	vm.parts = [];
+	$interval(function(){
+		vm.queryForInventory();
+	},300);
+		
+	
+	vm.queryForInventory = function () {
+		queryServiceFactory.get().then(function(result) {
+			vm.parts = result.data;
+			
+			if (vm.parts.length == 0) {
+				//  No inventory results were found then report that fact
+				vm.parts = [{partNumber: 'No parts found', desc: "Enter parts in the add inventory section to see them here"}]
+			} else { 
+				//  Inventory database results were found
+				//  Calculate the quantity and cost of each item in the database.
+				//  Quantities and costs are calculated outside of storage because some parts are comprised of other parts.
+				calculateQtyAndCost (vm.parts);
+			}
+		});
 	}
 });
 

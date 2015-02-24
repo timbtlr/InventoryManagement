@@ -10,7 +10,7 @@
 				<div class = "col-sm-3">
 					<div class="form-group">
 						<label>Part Number</label>
-						<input type="text" class="form-control" ng-model="main.new.id" required />
+						<input type="text" class="form-control" ng-model="newPartNumber" required />
 					</div>
 				</div>
 				
@@ -18,19 +18,19 @@
 				<div class = "col-sm-6">
 					<div class="form-group">
 						<label>Part Description</label>
-						<input type="text" class="form-control" ng-model="main.new.description" required />
+						<input type="text" class="form-control" ng-model="newDescription" required />
 					</div>
 				</div>
 			</div>
 			
 			<!--  Optional part fields for quantity, cost, and UOM-->
 			<!--  These fields are displayed only if the part does not contain children -->
-			<div class = "row" ng-show = "!main.new.otherParts">
+			<div class = "row" ng-show = "!otherPartsCheck">
 				<!-- Part Quantity Field -->
 				<div class = "col-sm-3">
 					<div class="form-group">
 						<label>Quantity</label>
-						<input type="text" class="form-control" ng-model="main.new.quantity"/>
+						<input type="text" class="form-control" ng-model="newQuantity"/>
 					</div>
 				</div>
 				
@@ -38,7 +38,7 @@
 				<div class = "col-sm-3">
 					<div class="form-group">
 						<label>Cost</label>
-						<input type="text" class="form-control" ng-model="main.new.cost"/>
+						<input type="text" class="form-control" ng-model="newCost"/>
 					</div>
 				</div>
 				
@@ -46,7 +46,7 @@
 				<div class = "col-sm-3">
 					<div class="form-group">
 						<label>Unit of Measurement (UOM)</label><br/>
-						<select class="input-sm" ng-model="uomSelect" ng-options="option.name for option in main.uomOptions"></select>
+						<select class="input-sm" ng-model="newUomSelect" ng-options="option.name for option in main.uomOptions"></select>
 					</div>
 				</div>
 			</div>
@@ -54,12 +54,12 @@
 			<!--  Child part field options for child part and parts per item definition -->
 			<!--  These fields are only displayed if the new part contains child parts -->
 			<form name="main.addForm" class="form">
-				<div class = "row" ng-show = "main.new.otherParts">
+				<div class = "row" ng-show = "otherPartsCheck">
 					<!-- Part Child Dropdown -->
 					<div class = "col-sm-3">
 						<div class="form-group">
 							<label>Children</label>
-							<select class="input-sm" ng-model="childrenSelect" ng-options="option.partNumber for option in main.parts"  required ></select>
+							<select class="input-sm" ng-model="newChildrenSelect" ng-options="option.partNumber for option in main.parts"  required ></select>
 						</div>
 					</div>
 					
@@ -67,13 +67,13 @@
 					<div class = "col-sm-3">
 						<div class="form-group">
 							<label>Parts per Item</label>
-							<input type="text" class="form-control" ng-model="main.new.ppi" required />
+							<input type="text" class="form-control" ng-model="newPpi" required />
 						</div>
 					</div>
 					
 					<!-- Button to add a child to the current part -->
 					<div class="col-sm-3">
-						<button class="btn btn-success pull-right addChildButton" ng-click="main.addChildToPart(childrenSelect, main.new.ppi)">Add Child to Part</button>
+						<button class="btn btn-success pull-right addChildButton" ng-click="main.addChildToPart(newchildrenSelect, newPpi)" ng-disabled = "main.parts.length > 0">Add Child to Part</button>
 					</div>
 				</div>
 			</form>
@@ -93,10 +93,10 @@
 			<!--  Contains the checkbox to indicate inclusion of child parts and the button to add the new part to the inventory. -->
 			<div class="row">
 				<div class="col-sm-3">
-					<label><input type="checkbox" ng-model="main.new.otherParts" ng-true-value="true" ng-false-value="false" /> Made of Other Parts</label>
+					<label><input type="checkbox" ng-model="otherPartsCheck" ng-true-value="true" ng-false-value="false" /> Made of Other Parts</label>
 				</div>
 				<div class="col-sm-6">
-					<button class="btn btn-success pull-Right">Add Part to Inventory</button>
+					<button class="btn btn-success pull-Right" ng-click= "main.addPartToInventory()">Add Part to Inventory</button>
 				</div>
 			</div>
 		</form>

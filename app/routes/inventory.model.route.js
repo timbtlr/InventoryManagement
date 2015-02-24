@@ -38,14 +38,21 @@ module.exports = function(router) {
 			inventory.quantity = req.body.quantity;
 			inventory.uom = req.body.uom;
 			inventory.cost = req.body.cost;
+			inventory.children = req.body.children
+			
+			console.log("Trying to add new item")
+			console.log(req.body)
+			console.log(req.body.newItem)
+			console.log(inventory.partNumber)
 
 			// Save the item in the inventory document
 			inventory.save(function(err) {
 				//  Check for and report errors
-				if (err)
+				if (err) {
 					res.send(err);
-				
-				res.json({ message: 'Inventory item created!' });
+				} else {
+					res.json({ message: 'Inventory item created!' });
+				}
 			});
 		})
 		 
@@ -54,11 +61,12 @@ module.exports = function(router) {
 			//  Query for inventory items
 			Inventory.find(function(err, inventoryItems) {
 				//  Check for and report query errors
-				if (err)
+				if (err) {
 					res.send(err);
-				
-				//  Return results via JSON
-				res.json(inventoryItems);
+				} else {
+					//  Return results via JSON
+					res.json(inventoryItems);
+				}
 			});
 		});
 

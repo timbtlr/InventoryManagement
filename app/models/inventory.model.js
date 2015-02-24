@@ -26,7 +26,8 @@ var InventorySchema  = new Schema({
 	desc: String,
 	quantity: Number,
 	uom: String,
-	cost: Number
+	cost: Number,
+	children: Array
 });
 
 //  Allows passage to other files when "Inventory" is referenced

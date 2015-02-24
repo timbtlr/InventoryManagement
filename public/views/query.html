@@ -30,8 +30,8 @@
 			<ul class="list-group">
 				<li class="list-group-item" ng-repeat="item in main.parts | filter:{partNumber:main.searchInput} | orderBy:main.order.key:main.order.reverse" ng-click="main.expand(item)">
 					{{item.partNumber}} : {{item.desc}}
-					<span class="badge" ng-show="main.badgeShow">Quantity: {{item.quantity}}</span>
-					<span class="badge" ng-show="main.badgeShow">Cost: ${{item.cost}}</span>
+					<span class="badge" ng-show="main.parts.length > 0">Quantity: {{item.quantity}}</span>
+					<span class="badge" ng-show="main.parts.length > 0">Cost: ${{item.cost}}</span>
 					<span class="badge hadChildrenBadge" ng-show="item.children.length > 0">Contains {{item.children.length}} parts</span>
 					<span class="badge" ng-show="item.children.length == 0">UOM: {{item.uom}}</span>
 					<ul class="list-group" ng-show="item.show">

@@ -1,9 +1,14 @@
 angular.module('AddService', []).factory('addServiceFactory', ['$http', function($http) {
-	
     return {
+		// call to get all inventory parts
+        get : function () {
+            return $http.get('/api/inventory');
+        },
+		
         // call to post an inventory item
-        post : function() {
-            return $http.post('/api/inventory');
+        post : function (newPart) {
+			console.log(newPart)
+            return $http.post('/api/inventory', newPart);
         }
     }       
 }]);
