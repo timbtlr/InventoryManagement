@@ -3,7 +3,7 @@
 		<h1>{{main.title}}</h1>
 		<div class="clearfix"></div>
 		
-		<form name="main.addForm" class="form">
+		<form name="addForm" class="form">
 			<!--  Main form row.  Contains inputs for part number and a description -->
 			<div class="row">
 				<!-- Part Number Field -->
@@ -73,7 +73,7 @@
 					
 					<!-- Button to add a child to the current part -->
 					<div class="col-sm-3">
-						<button class="btn btn-success pull-right addChildButton" ng-click="main.addChildToPart(newchildrenSelect, newPpi)" ng-disabled = "main.parts.length > 0">Add Child to Part</button>
+						<button class="btn btn-success pull-right addChildButton" ng-click="main.addChildToPart(newChildrenSelect, newPpi)" ng-disabled = "main.parts.length == 0">Add Child to Part</button>
 					</div>
 				</div>
 			</form>

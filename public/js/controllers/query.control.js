@@ -31,6 +31,10 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, $
     vm.title = "Current Inventory on File";
     vm.searchInput = '';
 	vm.badgeShow = true;
+	vm.editWindowShow = false;
+	vm.containerStyle = {};
+	
+	console.log(vm.containerStyle)
 	
 	//  Ordering definitions for database results
 	vm.orders = [{id: 1,title: 'Part Number Ascending',key: 'partNumber',reverse: false},
@@ -69,6 +73,30 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, $
 				calculateQtyAndCost (vm.parts);
 			}
 		});
+	}
+	
+	vm.openEditWindow = function (part) {
+		vm.editWindowShow = true;
+		vm.containerStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
+		
+		$scope.oldPartNumber = part.partNumber;
+		$scope.oldDescription = part.desc;
+		$scope.oldCost = part.cost;
+		$scope.oldQuantity = part.quantity;
+		$scope.oldUom = part.uom;
+	}
+	
+	vm.cancelEditPart = function (part) {
+		vm.editWindowShow = false;
+		vm.containerStyle = {};
+	}
+	
+	vm.removePart = function (part) {
+		vm.queryForInventory();
+	}
+	
+	vm.editPart = function (part) {
+		vm.queryForInventory();
 	}
 });
 

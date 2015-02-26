@@ -1,5 +1,5 @@
 
-angular.module('AddCtrl', []).controller('AddController', function($scope, $interval, addServiceFactory) {
+angular.module('AddCtrl', []).controller('AddController', function($scope, $window, addServiceFactory) {
     var vm = this;
     vm.title = "Add Items to Inventory";
     vm.searchInput = '';
@@ -49,6 +49,13 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $inte
 	}
 	
 	vm.addPartToInventory = function () {
+		for (var i = 0; i < vm.parts.length; i++) {
+			if (vm.parts[i].partNumber == $scope.newPartNumber) {
+				$window.alert("Part number \"" + $scope.newPartNumber + "\" exists in the inventory already");
+				return;
+			}
+		}
+			
 		var newPart = {partNumber: $scope.newPartNumber, 
 					   desc: $scope.newDescription, 
 					   quantity: $scope.newQuantity, 
