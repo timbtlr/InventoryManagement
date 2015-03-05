@@ -26,23 +26,19 @@ Description:
 Author:
 	Tim "KetsuN" Butler
 */
-angular.module('QueryCtrl', []).controller('QueryController', function($scope, $interval, queryServiceFactory) {
+angular.module('QueryCtrl', []).controller('QueryController', function($scope, globalServiceFactory, databaseServiceFactory) {
     var vm = this;
     vm.title = "Current Inventory on File";
     vm.searchInput = '';
 	vm.badgeShow = true;
 	vm.editWindowShow = false;
 	vm.containerStyle = {};
+	vm.editChildren = []
 	
-	console.log(vm.containerStyle)
+	vm.uomOptions = globalServiceFactory.getGlobalVars().uomOptions;
 	
 	//  Ordering definitions for database results
-	vm.orders = [{id: 1,title: 'Part Number Ascending',key: 'partNumber',reverse: false},
-    			 {id: 2,title: 'Part Number Descending',key: 'partNumber',reverse: true},
-    			 {id: 3,title: 'Cost Ascending',key: 'cost',reverse: false},
-    			 {id: 4,title: 'Cost Descending',key: 'cost',reverse: true},
-    			 {id: 3,title: 'Quantity Ascending',key: 'quantity',reverse: false},
-    			 {id: 4,title: 'Quantity Descending',key: 'quantity',reverse: true}];
+	vm.orders = globalServiceFactory.getGlobalVars().searchOrders;
 	vm.order = vm.orders[0];
 	
 	//  Function used to expand/collapse a part containing children
@@ -54,23 +50,21 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, $
 	
 	//  Retrieve all inventory results from the database
 	vm.parts = [];
-	$interval(function(){
-		vm.queryForInventory();
-	},300);
-		
 	
 	vm.queryForInventory = function () {
-		queryServiceFactory.get().then(function(result) {
+		databaseServiceFactory.get().then(function(result) {
 			vm.parts = result.data;
 			
 			if (vm.parts.length == 0) {
 				//  No inventory results were found then report that fact
 				vm.parts = [{partNumber: 'No parts found', desc: "Enter parts in the add inventory section to see them here"}]
+				vm.badgeShow = false;
 			} else { 
 				//  Inventory database results were found
 				//  Calculate the quantity and cost of each item in the database.
 				//  Quantities and costs are calculated outside of storage because some parts are comprised of other parts.
 				calculateQtyAndCost (vm.parts);
+				vm.badgeShow = true;
 			}
 		});
 	}
@@ -78,26 +72,82 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, $
 	vm.openEditWindow = function (part) {
 		vm.editWindowShow = true;
 		vm.containerStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
+		vm.editItem = part;
+		vm.editChildren = vm.editItem.children;
 		
-		$scope.oldPartNumber = part.partNumber;
-		$scope.oldDescription = part.desc;
-		$scope.oldCost = part.cost;
-		$scope.oldQuantity = part.quantity;
-		$scope.oldUom = part.uom;
+		if (vm.editItem.children.length == 0) {
+			$scope.oldPartNumber = part.partNumber;
+			$scope.oldDescription = part.desc;
+			$scope.oldCost = part.cost;
+			$scope.oldQuantity = part.quantity;
+			$scope.oldUom = part.uom;
+		} else {
+			$scope.oldPartNumber = part.partNumber;
+			$scope.oldDescription = part.desc;
+		}
 	}
 	
 	vm.cancelEditPart = function (part) {
 		vm.editWindowShow = false;
 		vm.containerStyle = {};
+		vm.queryForInventory();
 	}
 	
-	vm.removePart = function (part) {
+	vm.addChildToPart = function (newChild, newPpi) {
+		var newChildRecord = {partNumber: newChild.partNumber,
+							  desc: newChild.desc,
+							  cost: newChild.cost,
+							  ppi: newPpi};
+							  
+		vm.removeChildFromPart(newChild);
+		vm.editChildren.push(newChildRecord);
+	}
+	
+	vm.removeChildFromPart = function (oldChild) {
+		for (i = 0; i < vm.editChildren.length; i ++) {
+			if (vm.editChildren[i].partNumber == oldChild.partNumber) {
+				vm.editChildren.splice(i, 1);
+			}
+		}
+	}
+	
+	vm.removePart = function () {
+		databaseServiceFactory.remove($scope.oldPartNumber).then(function(result) {
+			console.log("Removed part")
+		});
+		
+		vm.editWindowShow = false;
+		vm.containerStyle = {};
 		vm.queryForInventory();
 	}
 	
 	vm.editPart = function (part) {
+		for (i = 0; i < vm.editChildren.length; i ++) {
+			console.log(vm.editChildren[i]);
+		}
+		
+		if (vm.editChildren.length == 0) {
+			var newPart = {partNumber: $scope.oldPartNumber, 
+						   desc: $scope.oldDescription, 
+						   quantity: $scope.oldQuantity, 
+						   cost: $scope.oldCost, 
+						   uom: $scope.oldUomSelect.abbr}
+		} else {
+			var newPart = {partNumber: $scope.oldPartNumber, 
+						   desc: $scope.oldDescription, 
+						   children: vm.editChildren}
+		}
+		
+		databaseServiceFactory.edit(newPart).then(function(result) {
+			console.log("Edited part!")
+		});
+		
+		vm.editWindowShow = false;
+		vm.containerStyle = {};
 		vm.queryForInventory();
 	}
+	
+	vm.queryForInventory();
 });
 
 

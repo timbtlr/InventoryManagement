@@ -1,5 +1,6 @@
 <div class="container" ng-controller="AddController as main">
 	<div class = "container">
+		<p class = "viewResponse" ng-style = "main.responseStyle">{{main.actionResponse}}</p>
 		<h1>{{main.title}}</h1>
 		<div class="clearfix"></div>
 		
@@ -45,7 +46,7 @@
 				<!-- Part Unit of Measurement (UOM) Field -->
 				<div class = "col-sm-3">
 					<div class="form-group">
-						<label>Unit of Measurement (UOM)</label><br/>
+						<label>Unit of Measurement</label><br/>
 						<select class="input-sm" ng-model="newUomSelect" ng-options="option.name for option in main.uomOptions"></select>
 					</div>
 				</div>

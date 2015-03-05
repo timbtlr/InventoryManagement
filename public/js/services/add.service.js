@@ -7,7 +7,6 @@ angular.module('AddService', []).factory('addServiceFactory', ['$http', function
 		
         // call to post an inventory item
         post : function (newPart) {
-			console.log(newPart)
             return $http.post('/api/inventory', newPart);
         }
     }       

@@ -2,68 +2,109 @@
 	<h1 ng-style = "main.containerStyle">{{main.title}}</h1>
 	
 	<div class = "editPopupWindow" ng-show = "main.editWindowShow">
-			<form name="editForm" class="form">
-				<!--  Main form row.  Contains inputs for part number and a description -->
-				<div class="row">
-					<!-- Part Number Field -->
-					<div class = "col-sm-3">
-						<div class="form-group">
-							<label>Part Number</label>
-							<input type="text" class="form-control" ng-model="oldPartNumber" required />
-						</div>
-					</div>
-					
-					<!-- Part Description Field -->
-					<div class = "col-sm-7">
-						<div class="form-group">
-							<label>Part Description</label>
-							<input type="text" class="form-control" ng-model="oldDescription" required />
-						</div>
-					</div>
-					
-					<div class="col-sm-2">
-						<button class="btn btn-success pull-Right queryEditPart" ng-click= "main.addPartToInventory()">Edit Part</button>
+		<h2>Edit Part</h1>
+	
+		<form name="editForm" class="form">
+			<!--  Main form row.  Contains inputs for part number and a description -->
+			<div class="row">
+				<!-- Part Number Field -->
+				<div class = "col-sm-3">
+					<div class="form-group">
+						<label>Part Number</label>
+						<input type="text" class="form-control" ng-model="oldPartNumber" ng-disabled = "true" required />
 					</div>
 				</div>
 				
-				<!--  Optional part fields for quantity, cost, and UOM-->
-				<!--  These fields are displayed only if the part does not contain children -->
-				<div class = "row" ng-show = "!otherPartsCheck">
-					<!-- Part Quantity Field -->
-					<div class = "col-sm-3">
-						<div class="form-group">
-							<label>Quantity</label>
-							<input type="text" class="form-control" ng-model="oldQuantity"/>
-						</div>
+				<!-- Part Description Field -->
+				<div class = "col-sm-7">
+					<div class="form-group">
+						<label>Part Description</label>
+						<input type="text" class="form-control" ng-model="oldDescription" required />
 					</div>
-					
-					<!-- Part Cost Field -->
-					<div class = "col-sm-3">
-						<div class="form-group">
-							<label>Cost</label>
-							<input type="text" class="form-control" ng-model="oldCost"/>
-						</div>
-					</div>
-					
-					<!-- Part Unit of Measurement (UOM) Field -->
-					<div class = "col-sm-3">
-						<div class="form-group">
-							<label>Unit of Measurement (UOM)</label><br/>
-							<select class="input-sm" ng-model="oldUomSelect" ng-options="option.name for option in main.uomOptions"></select>
-						</div>
-					</div>
-					
-					<div class="col-sm-3">
-						<button class="btn btn-success pull-Right queryRemovePart" ng-click= "main.removePart()">Remove Part</button>
+				</div>
+			</div>
+			
+			<!--  Optional part fields for quantity, cost, and UOM-->
+			<!--  These fields are displayed only if the part does not contain children -->
+			<div class = "row" ng-show = "!otherPartsCheck">
+				<!-- Part Quantity Field -->
+				<div class = "col-sm-3">
+					<div class="form-group">
+						<label>Quantity</label>
+						<input type="text" class="form-control" ng-model="oldQuantity" ng-disabled = "main.editItem.children.length > 0"/>
 					</div>
 				</div>
 				
+				<!-- Part Cost Field -->
+				<div class = "col-sm-3">
+					<div class="form-group">
+						<label>Cost</label>
+						<input type="text" class="form-control" ng-model="oldCost" ng-disabled = "main.editItem.children.length > 0"/>
+					</div>
+				</div>
+				
+				<!-- Part Unit of Measurement (UOM) Field -->
+				<div class = "col-sm-3">
+					<div class="form-group">
+						<label>Unit of Measurement</label><br/>
+						<select class="input-sm" ng-model="oldUomSelect" ng-options="option.name for option in main.uomOptions" ng-disabled = "main.editItem.children.length > 0"></select>
+					</div>
+				</div>
+			</div>
+			
+			<!--  Child part field options for child part and parts per item definition -->
+			<!--  These fields are only displayed if the new part contains child parts -->
+			<form name="main.addForm" class="form">
 				<div class = "row">
-					<div class="col-sm-12">
-						<button class="btn btn-success pull-Right queryCancelEdit" ng-click= "main.cancelEditPart()">Cancel</button>
+					<!-- Part Child Dropdown -->
+					<div class = "col-sm-4">
+						<div class="form-group">
+							<label>Children</label>
+							<select class="input-sm" ng-model="newChildrenSelect" ng-options="option.partNumber for option in main.parts"  required ></select>
+						</div>
+					</div>
+					
+					<!-- Child Parts per Item Field -->
+					<div class = "col-sm-3">
+						<div class="form-group">
+							<label>Parts per Item</label>
+							<input type="text" class="form-control" ng-model="newPpi" required />
+						</div>
+					</div>
+					
+					<!-- Button to add a child to the current part -->
+					<div class="col-sm-3">
+						<button class="btn btn-success pull-right addChildButton" ng-click="main.addChildToPart(newChildrenSelect, newPpi)" ng-disabled = "main.parts.length == 0">Add Child to Part</button>
 					</div>
 				</div>
 			</form>
+			
+			<!--  Shows a listing of current child parts defined for the new part -->
+			<div class="row" ng-show = "main.editChildren.length > 0">
+				<div class="col-sm-9">
+					<ul class="list-group childListGroup">
+						<li class="list-group-item" ng-repeat="child in main.editChildren">{{child.partNumber}} : {{child.desc}}
+							<span class="badge removeBadge" ng-click = "main.removeChildFromPart(child)">REMOVE</span>
+							<span class="badge">PPI: {{child.ppi}}</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+			
+			<div class = "row">
+				<div class="col-sm-2">
+					<button class="btn btn-success queryEditPart" ng-click= "main.editPart()">Confirm Edit</button>
+				</div>
+				
+				<div class="col-sm-2">
+					<button class="btn btn-success queryRemovePart" ng-click= "main.removePart()">Remove Part</button>
+				</div>
+				
+				<div class="col-sm-2">
+					<button class="btn btn-success queryCancelEdit" ng-click= "main.cancelEditPart()">Cancel</button>
+				</div>
+			</div>
+		</form>
 	</div>
 	
 	<div class = "col-sm-3 queryBackground" ng-style = "main.containerStyle">
@@ -95,9 +136,9 @@
 			<ul class="list-group">
 				<li class="list-group-item" ng-repeat="item in main.parts | filter:{partNumber:main.searchInput} | orderBy:main.order.key:main.order.reverse" ng-click="main.expand(item)">
 					{{item.partNumber}} : {{item.desc}}
-					<span class="badge editBadge" ng-show = "item.children.length == 0" ng-click = "main.openEditWindow(item)">EDIT</span>
-					<span class="badge" ng-show="main.parts.length > 0">Quantity: {{item.quantity}}</span>
-					<span class="badge" ng-show="main.parts.length > 0">Cost: ${{item.cost}}</span>
+					<span class="badge editBadge" ng-click = "main.openEditWindow(item)">EDIT</span>
+					<span class="badge" ng-show="main.badgeShow">Quantity: {{item.quantity}}</span>
+					<span class="badge" ng-show="main.badgeShow">Cost: ${{item.cost}}</span>
 					<span class="badge hadChildrenBadge" ng-show="item.children.length > 0">Contains {{item.children.length}} parts</span>
 					<span class="badge" ng-show="item.children.length == 0">UOM: {{item.uom}}</span>
 					<ul class="list-group" ng-show="item.show">

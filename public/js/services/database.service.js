@@ -9,13 +9,16 @@ Description:
 Author:
 	Tim "KetsuN" Butler
 */
-
-
-angular.module('QueryService', []).factory('queryServiceFactory', ['$http', function($http) {
+angular.module('DatabaseService', []).factory('databaseServiceFactory', ['$http', function($http) {
     return {
         // call to get all inventory parts
         get : function() {
             return $http.get('/api/inventory');
+        },
+		
+		// call to get all inventory parts
+        getOne : function(partNumber) {
+            return $http.get('/api/inventory/:partNumber', {params: {partNumber: partNumber}});
         },
 		
 		remove : function(partNumberOld) {
@@ -24,6 +27,13 @@ angular.module('QueryService', []).factory('queryServiceFactory', ['$http', func
 		
 		edit : function(newPart) {
             return $http.put('/api/inventory/:partNumber', newPart);
+        },
+		
+		// call to post an inventory item
+        post : function (newPart) {
+            return $http.post('/api/inventory', newPart);
         }
     }       
 }]);
+
+
