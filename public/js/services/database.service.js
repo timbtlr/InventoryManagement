@@ -11,18 +11,28 @@ Author:
 */
 angular.module('DatabaseService', []).factory('databaseServiceFactory', ['$http', function($http) {
     return {
-        // call to get all inventory parts
         get : function() {
             return $http.get('/api/inventory');
         },
 		
-		// call to get all inventory parts
         getOne : function(partNumber) {
-            return $http.get('/api/inventory/:partNumber', {params: {partNumber: partNumber}});
+            return $http.get('/api/inventory/' + partNumber);
         },
 		
-		remove : function(partNumberOld) {
-			return $http.delete('/api/inventory/:partNumber', {params: {partNumber: partNumberOld}})
+        getByArray : function(idArray) {
+            return $http.get('/api/inventory/fromArray/' + idArray);
+        },
+		
+        subtractFromPart : function(idArray) {
+            return $http.get('/api/inventory/fromArray/' + idArray);
+        },
+		
+        addToPart : function(idArray) {
+            return $http.get('/api/inventory/fromArray/' + idArray);
+        },
+		
+		remove : function(partNumber) {
+			return $http.delete('/api/inventory/' + partNumber)
         },
 		
 		edit : function(newPart) {

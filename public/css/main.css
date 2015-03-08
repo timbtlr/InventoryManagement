@@ -143,10 +143,43 @@ select.input-sm {
 }
 
 .editBadge {
-	background-color: #FF8221;
+	position: relative;
+	top: 1px;
+	background-image:url("../img/add.png");
+    background-repeat: no-repeat;
+    background-size: 17px;
+	background-color: white;
+    border-radius: 0px;
 	color: black;
-	font-weight: bold;
 	cursor: pointer;
+	height: 18px;
+	width: 18px;
+}
+
+.badge {
+	font-size: 13px;  
+	font-family: 'Shift', sans-serif;
+}
+
+.addIcon {
+	background-image:url("../img/add.png");
+}
+
+.subtractIcon {
+	background-image:url("../img/subtract.png");
+}
+
+.removeIcon {
+	background-image:url("../img/remove.png");
+}
+
+.infoIcon {
+	background-image:url("../img/info.png");
+}
+
+.partRow {
+	font-size: 14px;  
+	font-family: 'Shift', sans-serif;
 }
 
 .removeBadge {
@@ -174,4 +207,18 @@ select.input-sm {
 	font-size: 14px;  
 	font-family: 'Shift', sans-serif;
 	font-weight: bold;
+}
+
+.message{
+    display:none;
+    color:#000;
+    background:#fff;
+    position:absolute;
+	top: -20px;
+    left:20px;
+}
+
+.anchor:hover  .message{
+    display:block !important;
+    z-index:10;
 }

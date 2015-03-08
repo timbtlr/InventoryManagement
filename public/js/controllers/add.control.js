@@ -43,7 +43,9 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 
 	getPartArray (databaseServiceFactory, function (currentParts) {
 		vm.parts = currentParts;
+		$scope.newChildrenSelect = vm.parts[0];
 	});
+	
 	
 	/*
 	Function name:
@@ -56,19 +58,14 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 		Tim "KetsuN" Butler
 	*/
 	vm.addChildToPart = function (newChild, newPpi) {
-		if (typeof($scope.newPpi) == "undefined" || isNaN($scope.newPpi)) {
-			vm.responseStyle = {"color" : "red"}
-			vm.actionResponse = "Part per Item (PPI) field is invalid  (required number field)";
-		} else {
-			var newChildRecord = {partNumber: newChild.partNumber,
-								  desc: newChild.desc,
-								  cost: newChild.cost,
-								  ppi: newPpi};
-								  
-			vm.removeChildFromPart(newChild);
-			vm.childrenToAdd.push(newChildRecord);
-		}
-	}
+		var newChildRecord = {partNumber: newChild.partNumber,
+							  desc: newChild.desc,
+							  cost: newChild.cost,
+							  ppi: newPpi}
+							  
+		vm.removeChildFromPart(newChild);
+		vm.childrenToAdd.push(newChildRecord)
+	}	
 	
 	/*
 	Function name:
@@ -87,7 +84,9 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 				return;
 			}
 		}
+
 	}
+	
 	
 	/*
 	Function name:
@@ -111,19 +110,7 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 		Tim "KetsuN" Butler
 	*/
 	vm.addPartToInventory = function () {
-		if (typeof($scope.newPartNumber) == "undefined") {
-			vm.responseStyle = {"color" : "red"}
-			vm.actionResponse = "Part number field is invalid  (required field)";
-		} else if (typeof($scope.newDescription) == "undefined") {
-			vm.responseStyle = {"color" : "red"}
-			vm.actionResponse = "Description field is invalid  (required field)";
-		} else if ((vm.childrenToAdd.length == 0) && ((typeof($scope.newQuantity) == "undefined") || isNaN($scope.newQuantity))) {
-			vm.responseStyle = {"color" : "red"}
-			vm.actionResponse = "Quantity field is invalid  (required number field)";
-		} else if ((vm.childrenToAdd.length == 0) && ((typeof($scope.newCost) == "undefined") || isNaN($scope.newCost))) {
-			vm.responseStyle = {"color" : "red"}
-			vm.actionResponse = "Cost field is invalid  (required number field)";
-		} else {
+		if (vm.validateInputs()) {
 			//  Query to inventory to determine if the part already exists
 			databaseServiceFactory.getOne($scope.newPartNumber).then(function(result) {
 				if (result.data != null) {
@@ -132,52 +119,102 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 					vm.actionResponse = "Part number \"" + $scope.newPartNumber + "\" exists in the inventory already";
 				} else {
 					//  The part does not exist.  Add it.
-					var newPart = {}
+					var newPart = {partNumber: $scope.newPartNumber, 
+								   desc: $scope.newDescription, 
+								   quantity: $scope.newQuantity}
 			
 					if (vm.childrenToAdd.length == 0) {
 						//  Format the new part without a children attribute.
-						var newPart = {partNumber: $scope.newPartNumber, 
-									   desc: $scope.newDescription, 
-									   quantity: $scope.newQuantity, 
-									   cost: $scope.newCost, 
-									   uom: $scope.newUomSelect.abbr}
+						newPart.cost = $scope.newCost;
+						newPart.uom = $scope.newUomSelect.abbr;
+						newPart.children = [];
 					} else {
 						//  Format the new part with a children attribute.  
 						//  This part does not have a cost, quantity, nor UOM value.
-						var childrenList = [];
-					
-						for (var i = 0; i < vm.childrenToAdd.length; i++) {
-							childrenList.push (vm.childrenToAdd[i]);
-						}
-						
-						var newPart = {partNumber: $scope.newPartNumber, 
-									   desc: $scope.newDescription, 
-									   children: childrenList}
+						newPart.children = vm.childrenToAdd;
 					}		
 					
-					//  Add the formatted part to the inventory
-					databaseServiceFactory.post(newPart).then(function(result) {
-						//  Display response for the user
-						vm.responseStyle = {"color" : "green"}
-						vm.actionResponse = "Part number \"" + $scope.newPartNumber + "\" added to the inventory";
-						
-						//  Clear data fields
-						$scope.newPartNumber = "";
-						$scope.newDescription = "";
-						$scope.newQuantity = "";
-						$scope.newCost = "";
-						$scope.newUomSelect = vm.uomOptions[0];
-						vm.childrenToAdd = []
-						
-						getPartArray (databaseServiceFactory, function (currentParts) {
-							vm.parts = currentParts;
-						});
-					});
+					vm.insertPart (newPart);
 				}
 			});
 		}		
 	}
+	
+	
+	vm.validateInputs = function () {
+		if (typeof($scope.newPartNumber) == "undefined") {
+			vm.responseStyle = {"color" : "red"}
+			vm.actionResponse = "Part number field is invalid  (required field)";
+			return false;
+		} else if (typeof($scope.newDescription) == "undefined") {
+			vm.responseStyle = {"color" : "red"}
+			vm.actionResponse = "Description field is invalid  (required field)";
+			return false;
+		} else if ((typeof($scope.newQuantity) == "undefined") || isNaN($scope.newQuantity)) {
+			vm.responseStyle = {"color" : "red"}
+			vm.actionResponse = "Quantity field is invalid  (required number field)";
+			return false;
+		} else if ((vm.childrenToAdd.length == 0) && ((typeof($scope.newCost) == "undefined") || isNaN($scope.newCost))) {
+			vm.responseStyle = {"color" : "red"}
+			vm.actionResponse = "Cost field is invalid  (required number field)";
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	
+	vm.insertPart = function (newPart) {
+		var idArray = []
+		
+		for (var i = 0; i < newPart.children.length; i ++) {
+			idArray.push(newPart.children[i].partNumber);
+		}
+		
+		databaseServiceFactory.getByArray(idArray).then(function(result) {
+			results = result.data;
+			
+			for (var i = 0; i < newPart.children.length; i ++) {
+				for (var j = 0; j < results.length; j ++) {
+					if ((newPart.children[i].partNumber = results[j].partNumber) && ((newPart.children[i].ppi * newPart.quantity) > results[j].quantity)) {
+						vm.responseStyle = {"color" : "red"}
+						vm.actionResponse = "Not enough children parts to make this item.";
+						return;
+					}
+				}
+			}
+			
+			console.log(newPart);
+			
+			//  Add the formatted part to the inventory
+			databaseServiceFactory.post(newPart).then(function(result) {
+				//  Display response for the user
+				vm.responseStyle = {"color" : "green"}
+				vm.actionResponse = "Part number \"" + $scope.newPartNumber + "\" added to the inventory";
+
+				vm.clearFields();
+				
+				getPartArray (databaseServiceFactory, function (currentParts) {
+					vm.parts = currentParts;
+				});
+			});
+		});
+	}
+	
+	
+	vm.clearFields = function () {
+		//  Clear data fields
+		$scope.newPartNumber = "";
+		$scope.newDescription = "";
+		$scope.newQuantity = "";
+		$scope.newCost = "";
+		$scope.newUomSelect = vm.uomOptions[0];
+		$scope.newPpi = "";
+		vm.childrenToAdd = vm.parts[0];
+	}
 });
+
+
 
 
 /*

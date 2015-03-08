@@ -55,11 +55,7 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 		databaseServiceFactory.get().then(function(result) {
 			vm.parts = result.data;
 			
-			if (vm.parts.length == 0) {
-				//  No inventory results were found then report that fact
-				vm.parts = [{partNumber: 'No parts found', desc: "Enter parts in the add inventory section to see them here"}]
-				vm.badgeShow = false;
-			} else { 
+			if (vm.parts.length > 0) {
 				//  Inventory database results were found
 				//  Calculate the quantity and cost of each item in the database.
 				//  Quantities and costs are calculated outside of storage because some parts are comprised of other parts.

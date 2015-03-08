@@ -1,7 +1,7 @@
 <div class="container" ng-controller="AddController as main">
 	<div class = "container">
 		<p class = "viewResponse" ng-style = "main.responseStyle">{{main.actionResponse}}</p>
-		<h1>{{main.title}}</h1>
+		<h1>Add New Inventory Part</h1>
 		<div class="clearfix"></div>
 		
 		<form name="addForm" class="form">
@@ -11,7 +11,7 @@
 				<div class = "col-sm-3">
 					<div class="form-group">
 						<label>Part Number</label>
-						<input type="text" class="form-control" ng-model="newPartNumber" required />
+						<input type="text" class="form-control" ng-model="newPartNumber" />
 					</div>
 				</div>
 				
@@ -19,18 +19,18 @@
 				<div class = "col-sm-6">
 					<div class="form-group">
 						<label>Part Description</label>
-						<input type="text" class="form-control" ng-model="newDescription" required />
+						<input type="text" class="form-control" ng-model="newDescription" />
 					</div>
 				</div>
 			</div>
 			
 			<!--  Optional part fields for quantity, cost, and UOM-->
 			<!--  These fields are displayed only if the part does not contain children -->
-			<div class = "row" ng-show = "!otherPartsCheck">
+			<div class = "row">
 				<!-- Part Quantity Field -->
 				<div class = "col-sm-3">
 					<div class="form-group">
-						<label>Quantity</label>
+						<label>Initial Quantity</label>
 						<input type="text" class="form-control" ng-model="newQuantity"/>
 					</div>
 				</div>
@@ -39,7 +39,7 @@
 				<div class = "col-sm-3">
 					<div class="form-group">
 						<label>Cost</label>
-						<input type="text" class="form-control" ng-model="newCost"/>
+						<input type="text" class="form-control" ng-disabled = "main.childrenToAdd.length > 0" ng-model="newCost"/>
 					</div>
 				</div>
 				
@@ -47,56 +47,76 @@
 				<div class = "col-sm-3">
 					<div class="form-group">
 						<label>Unit of Measurement</label><br/>
-						<select class="input-sm" ng-model="newUomSelect" ng-options="option.name for option in main.uomOptions"></select>
+						<select class="form-control input-sm" ng-model="newUomSelect" ng-disabled = "main.childrenToAdd.length > 0" ng-options="option.name for option in main.uomOptions"></select>
 					</div>
 				</div>
 			</div>
-			
+			<hr/>
 			<!--  Child part field options for child part and parts per item definition -->
 			<!--  These fields are only displayed if the new part contains child parts -->
-			<form name="main.addForm" class="form">
-				<div class = "row" ng-show = "otherPartsCheck">
-					<!-- Part Child Dropdown -->
-					<div class = "col-sm-3">
-						<div class="form-group">
-							<label>Children</label>
-							<select class="input-sm" ng-model="newChildrenSelect" ng-options="option.partNumber for option in main.parts"  required ></select>
-						</div>
-					</div>
-					
-					<!-- Child Parts per Item Field -->
-					<div class = "col-sm-3">
-						<div class="form-group">
-							<label>Parts per Item</label>
-							<input type="text" class="form-control" ng-model="newPpi" required />
-						</div>
-					</div>
-					
-					<!-- Button to add a child to the current part -->
-					<div class="col-sm-3">
-						<button class="btn btn-success pull-right addChildButton" ng-click="main.addChildToPart(newChildrenSelect, newPpi)" ng-disabled = "main.parts.length == 0">Add Child to Part</button>
-					</div>
-				</div>
-			</form>
-			
-			<!--  Shows a listing of current child parts defined for the new part -->
-			<div class="row" ng-show = "main.childrenToAdd.length > 0">
-				<div class="col-sm-9">
-					<ul class="list-group childListGroup">
-						<li class="list-group-item" ng-repeat="item in main.childrenToAdd  | orderBy:main.order.key:main.order.reverse">{{item.partNumber}} : {{item.desc}}
-							<span class="badge removeBadge" ng-click = "main.removeChildFromPart(item)">REMOVE</span>
-							<span class="badge">PPI: {{item.ppi}}</span>
-						</li>
-					</ul>
+			<div class = "row">
+				<div class = "col-sm-3">
+					<h4>Add Children</h4>
 				</div>
 			</div>
+			<div class = "row">
+			
+				<!-- Part Child Dropdown -->
+				<div class = "col-sm-3">
+					<div class="form-group">
+						<label>Children</label>
+						<select class="input-sm" ng-model="newChildrenSelect" ng-options="option.partNumber for option in main.parts"  ></select>
+					</div>
+				</div>
+				
+				<!-- Child Parts per Item Field -->
+				<div class = "col-sm-3">
+					<div class="form-group">
+						<label>Parts per Item</label>
+						<input type="text" class="form-control" ng-model="newPpi" />
+					</div>
+				</div>
+				
+				<!-- Button to add a child to the current part -->
+				<div class="col-sm-3">
+					<button class="btn btn-success pull-right addChildButton" ng-click="main.addChildToPart(newChildrenSelect, newPpi)" ng-disabled = "main.parts.length == 0">Add Child to Part</button>
+				</div>
+			</div>
+			
+			
+			<div class="row" ng-show = "main.childrenToAdd.length > 0">
+				<div class="col-md-9">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th class = "partRow">Child Part Number</th>
+								<th class = "partRow">Description</th>
+								<th class = "partRow">Parts per Unit</th>
+								<th class = "partRow">Options</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="item in main.childrenToAdd  | orderBy:main.order.key:main.order.reverse">
+								<td class = "partRow">{{item.partNumber}}</td>
+								<td class = "partRow col-md-4">{{item.desc}}</td>
+								<td class = "partRow">{{item.ppi}}</td>
+								<td class = "partRow">
+									<span class="badge editBadge removeIcon anchor" ng-click = "main.removeChildFromPart(item)"><p class="message">Remove child</p></span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<hr/>
 			
 			<!--  Contains the checkbox to indicate inclusion of child parts and the button to add the new part to the inventory. -->
 			<div class="row">
-				<div class="col-sm-3">
-					<label><input type="checkbox" ng-model="otherPartsCheck" ng-true-value="true" ng-false-value="false" /> Made of Other Parts</label>
+				<div class="col-sm-7">
+					<button class="btn btn-success pull-Right" ng-click= "main.clearFields()">Clear All</button>
 				</div>
-				<div class="col-sm-6">
+				<div class="col-sm-2">
 					<button class="btn btn-success pull-Right" ng-click= "main.addPartToInventory()">Add Part to Inventory</button>
 				</div>
 			</div>

@@ -24,6 +24,7 @@ angular.module('QueryService', []).factory('queryServiceFactory', ['$http', func
 		
 		edit : function(newPart) {
             return $http.put('/api/inventory/:partNumber', newPart);
+			//return $http.put('/api/inventory/:partNumber', {params: {partNumber: partNumberOld}})
         }
     }       
 }]);

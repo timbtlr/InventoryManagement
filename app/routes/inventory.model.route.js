@@ -52,6 +52,8 @@ module.exports = function(router) {
 			inventory.uom = req.body.uom;
 			inventory.cost = req.body.cost;
 			inventory.children = req.body.children
+			
+			console.log(req.body.children);
 
 			//  Save the part in the inventory
 			inventory.save(function(err) {
@@ -97,7 +99,7 @@ module.exports = function(router) {
 		*/
 		.delete(function(req, res) {
 			//  Remove a single part from the inventory with the specified part number
-			Inventory.remove({partNumber: req.query.partNumber}, function(err, inventory) {
+			Inventory.remove({partNumber: req.params.partNumber}, function(err, inventory) {
 				//  Check for and report query errors
 				if (err) {
 					res.send(err);
@@ -107,7 +109,7 @@ module.exports = function(router) {
 			//  Remove all child references matching the part number that was removed
 			Inventory.update(
                  {}, 
-                 {$pull: {children: {partNumber: req.query.partNumber}}},  
+                 {$pull: {children: {partNumber: req.params.partNumber}}},  
                  { multi: true },
                  function(err, data){
 					res.send(err);
@@ -124,9 +126,8 @@ module.exports = function(router) {
 				partNumber	- Part ID number
 		*/
 		.get(function(req, res) {
-			console.log(req.query.partNumber)
 			//  Query for a specific item with the item ID
-			Inventory.findOne({partNumber: req.query.partNumber}, function(err, inventory) {
+			Inventory.findOne({partNumber: req.params.partNumber}, function(err, inventory) {
 				if (err) {
 					res.send(err);
 				} 
@@ -169,6 +170,17 @@ module.exports = function(router) {
 						res.json({message: req.body.partNumber + ' modified' });
 					});
 				}
+			});
+		});
+		
+		
+	//  Route for specific Inventory API requests (by item ID)
+	router.route('/inventory/fromArray/:idArray')
+		//  delete request for a specific item
+		.get(function(req, res) {
+			partNumberArray = req.params.idArray.split(",")
+			Inventory.find({partNumber : { $in: partNumberArray}}, function(err, result){
+				 res.json(result);
 			});
 		});
 }
