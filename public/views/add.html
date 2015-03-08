@@ -90,15 +90,13 @@
 						<thead>
 							<tr>
 								<th class = "partRow">Child Part Number</th>
-								<th class = "partRow">Description</th>
 								<th class = "partRow">Parts per Unit</th>
 								<th class = "partRow">Options</th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="item in main.childrenToAdd  | orderBy:main.order.key:main.order.reverse">
+							<tr ng-repeat="item in main.childrenToAdd">
 								<td class = "partRow">{{item.partNumber}}</td>
-								<td class = "partRow col-md-4">{{item.desc}}</td>
 								<td class = "partRow">{{item.ppi}}</td>
 								<td class = "partRow">
 									<span class="badge editBadge removeIcon anchor" ng-click = "main.removeChildFromPart(item)"><p class="message">Remove child</p></span>

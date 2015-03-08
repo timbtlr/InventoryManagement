@@ -23,8 +23,12 @@ angular.module('DatabaseService', []).factory('databaseServiceFactory', ['$http'
             return $http.get('/api/inventory/fromArray/' + idArray);
         },
 		
-        subtractFromPart : function(idArray) {
-            return $http.get('/api/inventory/fromArray/' + idArray);
+        addNewPart : function(part) {
+            return $http.put('/api/inventory/subtract/:part', part);
+        },
+		
+        subtractFromPart : function(part) {
+            return $http.put('/api/inventory/subtract/:part', part);
         },
 		
         addToPart : function(idArray) {

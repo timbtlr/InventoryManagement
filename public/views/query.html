@@ -92,7 +92,7 @@
 					<th class = "partRow">Cost</th>
 					<th class = "partRow">Quantity</th>
 					<th class = "partRow">UOM</th>
-					<th class = "partRow">Dependent</th>
+					<th class = "partRow">Children</th>
 					<th class = "partRow">Edit Options</th>
 				</tr>
 			</thead>
@@ -103,7 +103,7 @@
 					<td class = "partRow">${{item.cost}}</td>
 					<td class = "partRow">{{item.quantity}}</td>
 					<td class = "partRow">{{item.uom}}</td>
-					<td class = "partRow">Yes</td>
+					<td class = "partRow">{{item.children.length}}</td>
 					<td class = "partRow">
 						<span class="badge editBadge subtractIcon anchor" ng-click = "main.openEditWindow(item)"><p class="message">Subtract quantity</p></span>
 						<span class="badge editBadge addIcon anchor" ng-click = "main.openEditWindow(item)"><p class="message">Add quantity</p></span>

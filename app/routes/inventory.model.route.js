@@ -51,18 +51,43 @@ module.exports = function(router) {
 			inventory.quantity = req.body.quantity;
 			inventory.uom = req.body.uom;
 			inventory.cost = req.body.cost;
-			inventory.children = req.body.children
-			
-			console.log(req.body.children);
-
-			//  Save the part in the inventory
-			inventory.save(function(err) {
-				if (err) {
-					res.send(err);
+			inventory.children = req.body.children;
+				
+			if (inventory.children.length > 0) {
+				var idArray = [];
+				for (var i = 0; i < inventory.children.length; i ++) {
+					idArray.push(inventory.children[i].partNumber);
 				}
 				
-				res.json({ message: req.body.partNumber + ' created' });
-			});
+				Inventory.aggregate([{$match: {partNumber: {$in: idArray}}},
+									 {$group: {_id: 1, totalCost: {$sum: "$cost"}}}], function(err, inventoryItems) {
+					if (err) {
+						res.send(err);
+					} 
+					
+					inventory.cost = inventoryItems[0].totalCost;
+					
+					console.log(inventory);
+					
+					//  Save the part in the inventory
+					inventory.save(function(err) {
+						if (err) {
+							res.send(err);
+						}
+						
+						res.json({message: req.body.partNumber + ' created!' });
+					});
+				});
+			} else {
+				//  Save the part in the inventory
+				inventory.save(function(err) {
+					if (err) {
+						res.send(err);
+					}
+					
+					res.json({message: req.body.partNumber + ' created!' });
+				});
+			}
 		})
 		 
 		/*
@@ -180,6 +205,16 @@ module.exports = function(router) {
 		.get(function(req, res) {
 			partNumberArray = req.params.idArray.split(",")
 			Inventory.find({partNumber : { $in: partNumberArray}}, function(err, result){
+				 res.json(result);
+			});
+		});
+		
+		
+	//  Route for specific Inventory API requests (by item ID)
+	router.route('/inventory/subtract/:part')
+		//  delete request for a specific item
+		.put(function(req, res) {			
+			Inventory.update({partNumber : req.body.partNumber}, { $inc: { quantity: -req.body.subtract} }, function(err, result){
 				 res.json(result);
 			});
 		});

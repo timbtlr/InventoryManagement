@@ -41,13 +41,6 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 	vm.orders = globalServiceFactory.getGlobalVars().searchOrders;
 	vm.order = vm.orders[0];
 	
-	//  Function used to expand/collapse a part containing children
-	vm.expand = function(item) {
-		if (item.children.length > 0){
-			item.show = !item.show;
-		}
-	}
-	
 	//  Retrieve all inventory results from the database
 	vm.parts = [];
 	
@@ -59,7 +52,7 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 				//  Inventory database results were found
 				//  Calculate the quantity and cost of each item in the database.
 				//  Quantities and costs are calculated outside of storage because some parts are comprised of other parts.
-				calculateQtyAndCost (vm.parts);
+				//calculateQtyAndCost (vm.parts);
 				vm.badgeShow = true;
 			}
 		});
