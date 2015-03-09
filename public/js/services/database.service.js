@@ -41,11 +41,6 @@ angular.module('DatabaseService', []).factory('databaseServiceFactory', ['$http'
 		
 		edit : function(newPart) {
             return $http.put('/api/inventory/:partNumber', newPart);
-        },
-		
-		// call to post an inventory item
-        post : function (newPart) {
-            return $http.post('/api/inventory', newPart);
         }
     }       
 }]);

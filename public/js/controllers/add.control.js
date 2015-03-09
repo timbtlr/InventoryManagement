@@ -24,7 +24,7 @@ Description:
 Author:
 	Tim "KetsuN" Butler
 */
-angular.module('AddCtrl', []).controller('AddController', function($scope, $window, databaseServiceFactory, globalServiceFactory) {
+angular.module('AddCtrl', []).controller('AddController', function($scope, $window, databaseServiceFactory, addServiceFactory, globalServiceFactory) {
     var vm = this;
     vm.title = "Add Items to Inventory";
 	
@@ -58,10 +58,16 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 		Tim "KetsuN" Butler
 	*/
 	vm.addChildToPart = function (newChild, newPpi) {
-		vm.removeChildFromPart(newChild);
-		vm.childrenToAdd.push({partNumber: newChild.partNumber,
-							   desc: newChild.desc,
-							   ppi: newPpi});
+		
+		if (vm.validateChildInputs()) {
+			vm.removeChildFromPart(newChild);
+			vm.childrenToAdd.push({partNumber: newChild.partNumber,
+								   desc: newChild.desc,
+								   ppi: newPpi});
+			$scope.newPpi = undefined;
+			
+			vm.displayResponse (newChild.partNumber + " added as a child", "green");
+		}
 	}	
 	
 	/*
@@ -78,6 +84,7 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 		for (i = 0; i < vm.childrenToAdd.length; i ++) {
 			if (vm.childrenToAdd[i].partNumber == newChild.partNumber) {
 				vm.childrenToAdd.splice(i, 1);
+				vm.displayResponse (newChild.partNumber + " removed as a child", "green");
 			}
 		}
 	}
@@ -105,7 +112,7 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 		Tim "KetsuN" Butler
 	*/
 	vm.addPartToInventory = function () {
-		if (vm.validateInputs()) {
+		if (vm.validateMainInputs()) {
 			//  Query to inventory to determine if the part already exists
 			databaseServiceFactory.getOne($scope.newPartNumber).then(function(result) {
 				if (result.data != null) {
@@ -137,20 +144,31 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 	}
 	
 	
-	vm.validateInputs = function () {
+	vm.validateMainInputs = function () {
 		if (typeof($scope.newPartNumber) == "undefined") {
-			vm.displayResponse ("Part number field is invalid  (required field)", "red");
+			vm.displayResponse ("Part number field is invalid  --  required", "red");
 			return false;
 		} else if (typeof($scope.newDescription) == "undefined") {
-			vm.displayResponse ("Description field is invalid  (required field)", "red");
+			vm.displayResponse ("Description field is invalid  --  required", "red");
 			return false;
-		} else if ((typeof($scope.newQuantity) == "undefined") || isNaN($scope.newQuantity)) {
-			vm.displayResponse ("Quantity field is invalid  (required number field)", "red");
+		} else if ((typeof($scope.newQuantity) == "undefined") || isNaN($scope.newQuantity) || $scope.newQuantity < 0) {
+			vm.displayResponse ("Quantity field is invalid  --  positive numbers only", "red");
 			return false;
-		} else if ((vm.childrenToAdd.length == 0) && ((typeof($scope.newCost) == "undefined") || isNaN($scope.newCost))) {
-			vm.displayResponse ("Cost field is invalid  (required number field)", "red");
+		} else if ((vm.childrenToAdd.length == 0) && ((typeof($scope.newCost) == "undefined") || isNaN($scope.newCost) || $scope.newCost < 0)) {
+			vm.displayResponse ("Cost field is invalid  --  positive numbers only", "red");
 			return false;
 		} else {
+			vm.displayResponse ("", "");
+			return true;
+		}
+	}
+	
+	vm.validateChildInputs = function () {
+		if (typeof($scope.newPpi) == "undefined" || isNaN($scope.newPpi) || $scope.newPpi < 0) {
+			vm.displayResponse ("Child Parts per Unit field is invalid  --  positive numbers only", "red");
+			return false;
+		} else {
+			vm.displayResponse ("", "");
 			return true;
 		}
 	}
@@ -176,7 +194,7 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 			}
 			console.log("doing some posting");
 			//  Add the formatted part to the inventory
-			databaseServiceFactory.post(newPart).then(function(result) {
+			addServiceFactory.addNewPart(newPart).then(function(result) {
 				console.log("posted");
 				for (var i = 0; i < newPart.children.length; i ++) {
 					var removePart = {partNumber: newPart.children[i].partNumber,
@@ -204,12 +222,12 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 	
 	vm.clearFields = function () {
 		//  Clear data fields
-		$scope.newPartNumber = "";
-		$scope.newDescription = "";
-		$scope.newQuantity = "";
-		$scope.newCost = "";
+		$scope.newPartNumber = undefined;
+		$scope.newDescription = undefined;
+		$scope.newQuantity = undefined;
+		$scope.newCost = undefined;
 		$scope.newUomSelect = vm.uomOptions[0];
-		$scope.newPpi = "";
+		$scope.newPpi = undefined;
 		$scope.newChildrenSelect = vm.parts[0]
 		vm.childrenToAdd = [];
 	}

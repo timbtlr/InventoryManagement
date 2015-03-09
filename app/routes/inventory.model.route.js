@@ -25,12 +25,11 @@ module.exports = function(router) {
 		//  This console logging function can be saved to a file later.  
 		//  For now it is for testing.
 		console.log('Logger action');
-		next(); 
+		next(); 	 
 	});
-			
-			
-	//  Route for unspecific Inventory API requests
-	router.route('/inventory')
+	
+	
+	router.route('/addNewPart/')
 		/*
 			POST HTTP REQUEST - Add a new part to inventory
 			
@@ -55,27 +54,29 @@ module.exports = function(router) {
 				
 			if (inventory.children.length > 0) {
 				var idArray = [];
+				inventory.cost = 0;
 				for (var i = 0; i < inventory.children.length; i ++) {
 					idArray.push(inventory.children[i].partNumber);
 				}
 				
 				Inventory.aggregate([{$match: {partNumber: {$in: idArray}}},
-									 {$group: {_id: 1, totalCost: {$sum: "$cost"}}}], function(err, inventoryItems) {
+									 {$group: {_id: "$partNumber", totalCost: {$sum: "$cost"}}}], function(err, inventoryItems) {
 					if (err) {
 						res.send(err);
 					} 
 					
-					inventory.cost = inventoryItems[0].totalCost;
-					
-					console.log(inventory);
+					inventoryItems.forEach(function (entry,index,object) {
+						var index = inventory.children.map(function(e) {return e.partNumber;}).indexOf(entry._id);
+						inventory.cost = inventory.cost + (entry.totalCost * inventory.children[index].ppi);
+					});
 					
 					//  Save the part in the inventory
 					inventory.save(function(err) {
 						if (err) {
 							res.send(err);
+						} else {
+							res.json({message: req.body.partNumber + ' created!' });
 						}
-						
-						res.json({message: req.body.partNumber + ' created!' });
 					});
 				});
 			} else {
@@ -83,13 +84,16 @@ module.exports = function(router) {
 				inventory.save(function(err) {
 					if (err) {
 						res.send(err);
+					} else {
+						res.json({message: req.body.partNumber + ' created!' });
 					}
-					
-					res.json({message: req.body.partNumber + ' created!' });
 				});
 			}
 		})
-		 
+			
+			
+	//  Route for unspecific Inventory API requests
+	router.route('/inventory')
 		/*
 			GET HTTP REQUEST - Get all items from inventory
 			
