@@ -1,7 +1,7 @@
 <div class="container" ng-controller="AddController as main">
 	<div class = "container">
-		<p class = "viewResponse" ng-style = "main.responseStyle">{{main.actionResponse}}</p>
 		<h1>Add New Inventory Part</h1>
+		<p class = "viewResponse" ng-style = "main.responseStyle">{{main.actionResponse}}</p>
 		<div class="clearfix"></div>
 		
 		<form name="addForm" class="form">
@@ -11,7 +11,7 @@
 				<div class = "col-sm-3">
 					<div class="form-group">
 						<label>Part ID</label>
-						<input type="text" class="form-control" ng-model="newPartNumber" />
+						<input type="text" class="form-control input-sm" ng-model="newPartNumber" />
 					</div>
 				</div>
 				
@@ -19,7 +19,7 @@
 				<div class = "col-sm-6">
 					<div class="form-group">
 						<label>Part Description</label>
-						<input type="text" class="form-control" ng-model="newDescription" />
+						<input type="text" class="form-control input-sm" ng-model="newDescription" />
 					</div>
 				</div>
 			</div>
@@ -31,7 +31,7 @@
 				<div class = "col-sm-3">
 					<div class="form-group">
 						<label>Initial Quantity</label>
-						<input type="text" class="form-control" ng-model="newQuantity"/>
+						<input type="text" class="form-control input-sm" ng-model="newQuantity"/>
 					</div>
 				</div>
 				
@@ -39,7 +39,7 @@
 				<div class = "col-sm-3">
 					<div class="form-group">
 						<label>Cost per Unit</label>
-						<input type="text" class="form-control" ng-disabled = "main.childrenToAdd.length > 0" ng-model="newCost"/>
+						<input type="text" class="form-control input-sm" ng-disabled = "main.childrenToAdd.length > 0" ng-model="newCost"/>
 					</div>
 				</div>
 				
@@ -72,7 +72,7 @@
 				<div class = "col-sm-3">
 					<div class="form-group">
 						<label>Child Parts per Unit</label>
-						<input type="text" class="form-control" ng-model="newPpi" />
+						<input type="text" class="form-control input-sm" ng-model="newPpi" />
 					</div>
 				</div>
 				
@@ -85,7 +85,7 @@
 			
 			<div class="row" ng-show = "main.childrenToAdd.length > 0">
 				<div class="col-md-9">
-					<table class="table table-striped">
+					<table class="table table-striped table-bordered">
 						<thead>
 							<tr>
 								<th class = "partRow">Child Part Number</th>

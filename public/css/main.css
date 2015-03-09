@@ -12,7 +12,8 @@
 
 .nav li {
 	display: inline;
-	
+	background-color: black;
+    border-radius: 5px;
 }
 
 .nav a:hover{
@@ -105,9 +106,10 @@ select.input-sm {
 	z-index: 1;
 }
 
-.editPopupWindow {
+.editPopupWindow, .addPopupWindow {
 	position: absolute;
-	width: 875px;
+	top: 210px;
+	width: 675px;
 	left: 350px;
 	padding: 20px;
 	z-index: 2;
@@ -202,6 +204,7 @@ select.input-sm {
 }
 
 .viewResponse {
+	margin-top: 25px;
 	margin-left: 25px;
 	height: 20px;
 	font-size: 14px;  

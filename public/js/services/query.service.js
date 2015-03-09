@@ -13,18 +13,8 @@ Author:
 
 angular.module('QueryService', []).factory('queryServiceFactory', ['$http', function($http) {
     return {
-        // call to get all inventory parts
-        get : function() {
-            return $http.get('/api/inventory');
-        },
-		
-		remove : function(partNumberOld) {
-			return $http.delete('/api/inventory/:partNumber', {params: {partNumber: partNumberOld}})
-        },
-		
 		edit : function(newPart) {
-            return $http.put('/api/inventory/:partNumber', newPart);
-			//return $http.put('/api/inventory/:partNumber', {params: {partNumber: partNumberOld}})
+            return $http.put('/api/query/addQuantity/:partNumber', newPart);
         }
     }       
 }]);

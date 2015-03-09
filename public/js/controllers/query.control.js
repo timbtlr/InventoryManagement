@@ -26,7 +26,7 @@ Description:
 Author:
 	Tim "KetsuN" Butler
 */
-angular.module('QueryCtrl', []).controller('QueryController', function($scope, globalServiceFactory, databaseServiceFactory) {
+angular.module('QueryCtrl', []).controller('QueryController', function($scope, globalServiceFactory, queryServiceFactory, databaseServiceFactory) {
     var vm = this;
     vm.title = "Current Inventory on File";
     vm.searchInput = '';
@@ -63,45 +63,29 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 		vm.containerStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
 		vm.editItem = part;
 		vm.editChildren = vm.editItem.children;
-		
-		if (vm.editItem.children.length == 0) {
-			$scope.oldPartNumber = part.partNumber;
-			$scope.oldDescription = part.desc;
-			$scope.oldCost = part.cost;
-			$scope.oldQuantity = part.quantity;
-			$scope.oldUom = part.uom;
-		} else {
-			$scope.oldPartNumber = part.partNumber;
-			$scope.oldDescription = part.desc;
-		}
+		$scope.oldPartNumber = part.partNumber;
+		$scope.oldDescription = part.desc;
 	}
 	
-	vm.cancelEditPart = function (part) {
+	vm.openAddWindow = function (part) {
+		vm.addWindowShow = true;
+		vm.containerStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
+		vm.addItem = part;
+		vm.addChildren = vm.addItem.children;
+		$scope.addPartNumber = part.partNumber;
+		$scope.addDescription = part.desc;
+		$scope.addQuantity = 0;
+	}
+	
+	vm.closePopupWindow = function (part) {
 		vm.editWindowShow = false;
+		vm.addWindowShow = false;
 		vm.containerStyle = {};
 		vm.queryForInventory();
 	}
 	
-	vm.addChildToPart = function (newChild, newPpi) {
-		var newChildRecord = {partNumber: newChild.partNumber,
-							  desc: newChild.desc,
-							  cost: newChild.cost,
-							  ppi: newPpi};
-							  
-		vm.removeChildFromPart(newChild);
-		vm.editChildren.push(newChildRecord);
-	}
-	
-	vm.removeChildFromPart = function (oldChild) {
-		for (i = 0; i < vm.editChildren.length; i ++) {
-			if (vm.editChildren[i].partNumber == oldChild.partNumber) {
-				vm.editChildren.splice(i, 1);
-			}
-		}
-	}
-	
-	vm.removePart = function () {
-		databaseServiceFactory.remove($scope.oldPartNumber).then(function(result) {
+	vm.removePart = function (part) {
+		databaseServiceFactory.remove(part.partNumber).then(function(result) {
 			console.log("Removed part")
 		});
 		
@@ -136,69 +120,60 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 		vm.queryForInventory();
 	}
 	
-	vm.queryForInventory();
-});
-
-
-/*
-Function Name:
-	calculateQtyAndCost
-	
-Description:
-	Calculates the quantity and cost of inventory parts in an array.  
-	Quantity calculation:
-		Quantity for a part with no children is the raw value of the part quantity.
-		Quantity for a part with children is the lowest number based on the quantities of children available
+	vm.addParts = function () {
+		var idArray = []
+		var part = vm.addItem;
+		part.quantity = Number(part.quantity) + Number($scope.addQuantity);
 		
-	Cost calculation:
-		Cost is calculated based on the number of each child contributing to the quantity of a part.
-
-Author:
-	Tim "KetsuN" Butler
-*/
-calculateQtyAndCost = function (partArray) {
-	//  Create an item lookup map for the part array
-	var lookup = {};
-	for (var i = 0, len = partArray.length; i < len; i++) {
-		lookup[partArray[i].partNumber] = partArray[i];
-	}
-	
-	//  Iterate through each part in the part array
-	for (i = 0; i < partArray.length; i++) {
-		var part = partArray[i];
+		for (var i = 0; i < part.children.length; i ++) {
+			idArray.push(part.children[i].partNumber);
+		}
 		
-		//  Determine if the part has children.  If so, calculate cost and quantity
-		if (part.children.length != 0) {
-			var maxQuantity = null;
-			var totalCost = 0;
+		databaseServiceFactory.getByArray(idArray).then(function(result) {
+			results = result.data;
 			
-			//  Iterate through each child in the current part
-			for (j = 0; j < part.children.length; j++) {
-				//  Append child cost and available quantity from the lookup
-				var child = part.children[j];
-				child.cost = lookup[child.partNumber].cost;
-				child.quantity = lookup[child.partNumber].quantity;
-				
-				//  Determine the maximum part quantity available based on available child quantities
-				var tempQuantity = lookup[child.partNumber].quantity / child.ppi; 
-				if ((tempQuantity < maxQuantity) || (maxQuantity == null)) {
-					maxQuantity = tempQuantity
+			for (var i = 0; i < part.children.length; i ++) {
+				for (var j = 0; j < results.length; j ++) {
+					if ((part.children[i].partNumber == results[j].partNumber) && ((part.children[i].ppi * $scope.addQuantity) > results[j].quantity)) {
+						vm.popupResponse ("Not enough children parts to make " + $scope.addQuantity + " parts." , "red");
+						return;
+					}
 				}
 			}
 			
-			//  Round part quantity down to nearest whole number
-			maxQuantity = Math.floor(maxQuantity);
-			
-			//  Calculate part cost based on child quantities contributing to total part quantity
-			for (j = 0; j < part.children.length; j++) {
-				var child = part.children[j];
-				totalCost = totalCost + (lookup[child.partNumber].cost * (maxQuantity * child.ppi))
-				totalCost = Math.ceil(totalCost * 100)/100;
-			}
+			//  Add the formatted part to the inventory
+			queryServiceFactory.edit(part).then(function(result) {
+				for (var i = 0; i < part.children.length; i ++) {
+					var removePart = {partNumber: part.children[i].partNumber,
+									  subtract: (part.children[i].ppi * $scope.addQuantity)}
+					
+					//  Add the formatted part to the inventory
+					databaseServiceFactory.subtractFromPart(removePart).then(function(result) { });
+				}
 				
-			//  Store quantity and cost for display
-			part.quantity = maxQuantity;
-			part.cost = totalCost;
-		}
+				//  Display response for the user
+				vm.displayResponse ("Added " + $scope.addQuantity + " of part " + $scope.addPartNumber, "green");
+				vm.closePopupWindow();
+				
+				getPartArray (databaseServiceFactory, function (currentParts) {
+					vm.parts = currentParts;
+					$scope.newChildrenSelect = vm.parts[0];
+				});
+			});
+		});
 	}
-}
+	
+	vm.queryForInventory();
+	
+	
+	vm.displayResponse = function (message, color) {
+		vm.responseStyle = {"color" : color}
+		vm.actionResponse = message;
+	}
+	
+	
+	vm.popupResponse = function (message, color) {
+		vm.popupResponseStyle = {"color" : color}
+		vm.popupActionResponse = message;
+	}
+});

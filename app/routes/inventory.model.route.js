@@ -29,7 +29,47 @@ module.exports = function(router) {
 	});
 	
 	
-	router.route('/addNewPart/')
+	router.route('/query/addQuantity/:partNumber')
+		/*
+			PUT HTTP REQUEST - Updates a single part in the inventory.
+			
+			 Updates a single part in the inventory using the provided part properties.
+			 The HTTP request body property contains the following values:
+				partNumber 	- Part ID string used to find an existing part in inventory
+				desc		- Part description
+				quantity	- Part quantity on file
+				uom			- Part unit of measurement
+				cost		- Part cost per unit
+				children	- Any children that this part is made of
+		*/
+		.put(function(req, res) {
+			//  Find a single existing part with the specified part number
+			Inventory.findOne({partNumber: req.body.partNumber}, function(err, inventory) {
+				if (err) {
+					res.send(err);
+				} else {
+					//  Alter existing part properties
+					inventory.desc = req.body.desc;
+					inventory.quantity = req.body.quantity;
+					inventory.uom = req.body.uom;
+					inventory.cost = req.body.cost;
+					inventory.children = req.body.children;
+	
+					//  Save the updated part
+					inventory.save(function(err) {
+						if (err) {
+							res.send(err);
+						} else {
+							res.json({message: req.body.partNumber + ' modified' });
+						}
+						
+					});
+				}
+			});
+		});
+	
+	
+	router.route('/add/addNewPart/')
 		/*
 			POST HTTP REQUEST - Add a new part to inventory
 			
