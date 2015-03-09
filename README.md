@@ -10,7 +10,7 @@ The following items should be installed before running the InventoryApplication:
 # Configuring the Database
 * TBD
 
-# Running the application
+# Running the Application
 * Configure the MongoDB database using the above steps.
 * Move the code files to the server that will house the Inventory Application.  Note the server IP address.  
 * Edit the server.js file "port" variable to the desired port that users will access the application.  (Default is 8080)
