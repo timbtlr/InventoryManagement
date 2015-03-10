@@ -32,8 +32,49 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
     vm.searchInput = '';
 	vm.badgeShow = true;
 	
+	function PopupHandler () {
+		this.heading = "";
+		this.windowShow = false;
+		this.windowType = ""
+		this.response = "";
+		this.responseStyle = "";
+		this.editItem = {};
+		
+		this.openAddWindow = function () {
+			this.heading = "Add Parts to Inventory";
+			this.windowShow = true;
+			this.windowType = "add";
+		};
+		
+		this.openSubtractWindow = function () {
+			this.heading = "Subtract Parts from Inventory";
+			this.windowShow = true;
+			this.windowType = "subtract";
+		};
+		
+		this.openEditWindow = function () {
+			this.heading = "Edit a Part";
+			this.windowShow = true;
+			this.windowType = "edit";
+		};
+		
+		this.closeAllWindows = function () {
+			this.windowShow = false;
+			this.windowType = "";
+		};
+		
+		this.getChildren = function () {
+			return this.editItem.children;
+		}
+		
+		this.setResponse = function (message, color ) {
+			this.responseStyle = {"color" : color};
+			this.response = message;
+		}
+	}
+	
 	vm.popupHandler = new PopupHandler ();
-	vm.popupHandler.backgroundStyle = {};
+	vm.containerStyle = {};
 	vm.editChildren = []
 	
 	vm.uomOptions = globalServiceFactory.getGlobalVars().uomOptions;
@@ -54,9 +95,9 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 	
 	
 	vm.openAddWindow = function (part) {
-		vm.popupHandler.backgroundStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
+		vm.containerStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
 		vm.popupHandler.openAddWindow();
-		vm.popupHandler.editPart = part;
+		vm.popupHandler.editItem = part;
 		$scope.popupPartNumber = part.partNumber;
 		$scope.popupDescription = part.desc;
 		$scope.popupQuantity = 0;
@@ -65,9 +106,9 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 	
 	
 	vm.openSubtractWindow = function (part) {
-		vm.popupHandler.backgroundStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
+		vm.containerStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
 		vm.popupHandler.openSubtractWindow();
-		vm.popupHandler.editPart = part;
+		vm.popupHandler.editItem = part;
 		$scope.popupPartNumber = part.partNumber;
 		$scope.popupDescription = part.desc;
 		$scope.popupQuantity = 0;
@@ -76,31 +117,30 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 	
 	
 	vm.openEditWindow = function (part) {
-		vm.popupHandler.backgroundStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
+		vm.containerStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
 		vm.popupHandler.openEditWindow();
-		vm.popupHandler.editPart = part;
-		$scope.popupPartNumber = part.partNumber;
-		$scope.popupDescription = part.desc;
-		$scope.popupCost = part.cost;
-	}
-	
-	
-	vm.openRemoveWindow = function (part) {
-		vm.popupHandler.backgroundStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
-		vm.popupHandler.openRemoveWindow();
-		vm.popupHandler.setResponse ("Removing Part  --  Are you sure?", "red");;
-		vm.popupHandler.editPart = part;
+		vm.popupHandler.editItem = part;
 		$scope.popupPartNumber = part.partNumber;
 		$scope.popupDescription = part.desc;
 	}
 	
 	
-	vm.removePart = function () {
-		databaseServiceFactory.remove(vm.popupHandler.editPart.partNumber).then(function(result) { 
-			vm.popupHandler.closeAllWindows();
-			vm.queryForInventory();
-			vm.displayResponse ("Removed " + $scope.popupPartNumber + " from inventory", "green");
-		});;
+	vm.closePopupWindow = function (part) {
+		vm.popupHandler.closeAllWindows();
+		vm.addWindowShow = false;
+		vm.containerStyle = {};
+		vm.queryForInventory();
+	}
+	
+	
+	vm.removePart = function (part) {
+		databaseServiceFactory.remove(part.partNumber).then(function(result) {
+			console.log("Removed part")
+		});
+		
+		vm.editWindowShow = false;
+		vm.containerStyle = {};
+		vm.queryForInventory();
 	}
 	
 	vm.editPart = function (part) {
@@ -109,13 +149,31 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 		} else if ((typeof($scope.popupCost) == "undefined") || isNaN($scope.popupCost)) {
 			vm.popupHandler.setResponse ("Invalid Cost  --  required number", "red");;
 		} else {
-			vm.popupHandler.editPart.desc = $scope.popupDescription;
-			vm.popupHandler.editPart.cost = $scope.popupCost;
+		
+			var partChildren = vm.popupHandler.editItem.children;
 			
-			databaseServiceFactory.edit(vm.popupHandler.editPart);
+			for (i = 0; i < partChildren.length; i ++) {
+				console.log(partChildren[i]);
+			}
 			
-			vm.popupHandler.closeAllWindows();
-			vm.popupHandler.backgroundStyle = {};
+			if (partChildren.length == 0) {
+				var newPart = {partNumber: $scope.oldPartNumber, 
+							   desc: $scope.oldDescription, 
+							   quantity: $scope.oldQuantity, 
+							   cost: $scope.oldCost, 
+							   uom: $scope.oldUomSelect.abbr}
+			} else {
+				var newPart = {partNumber: $scope.oldPartNumber, 
+							   desc: $scope.oldDescription, 
+							   children: vm.editChildren}
+			}
+			
+			databaseServiceFactory.edit(newPart).then(function(result) {
+				console.log("Edited part!")
+			});
+			
+			vm.editWindowShow = false;
+			vm.containerStyle = {};
 			vm.queryForInventory();
 		}
 	}
@@ -126,7 +184,7 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 			vm.popupHandler.setResponse ("Invalid # Parts to Add  --  required number", "red");;
 		} else {
 			var idArray = []
-			var part = vm.popupHandler.editPart;
+			var part = vm.popupHandler.editItem;
 			part.quantity = Number($scope.popupQuantity);
 			
 			for (var i = 0; i < part.children.length; i ++) {
@@ -156,41 +214,20 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 					}
 					
 					//  Display response for the user
-					vm.displayResponse ($scope.popupQuantity + " quantity added to " + $scope.popupPartNumber, "green");
-					vm.popupHandler.closeAllWindows();
+					vm.displayResponse ("Added " + $scope.popupQuantity + " of part " + $scope.popupPartNumber, "green");
+					vm.closePopupWindow();
 					
 					getPartArray (databaseServiceFactory, function (currentParts) {
 						vm.parts = currentParts;
 						$scope.newChildrenSelect = vm.parts[0];
-						vm.queryForInventory();
 					});
 				});
-			});
-		}
-		
-	}
-	
-	
-	
-	vm.subtractParts = function (part) {
-		if ((typeof($scope.popupQuantity) == "undefined") || isNaN($scope.popupQuantity)) {
-			vm.popupHandler.setResponse ("Invalid # Parts to Remove  --  required number", "red");
-		} else if ($scope.popupQuantity > vm.popupHandler.editPart.quantity) {
-			vm.popupHandler.setResponse ("Cannot remove more quantity than the inventory contains", "red");
-		} else {
-			var removePart = {partNumber: vm.popupHandler.editPart.partNumber,
-							  subtract: $scope.popupQuantity};
-						
-			//  Add the formatted part to the inventory
-			databaseServiceFactory.subtractFromPart(removePart).then(function(result) { 
-				vm.displayResponse(removePart.subtract + " quantity removed from " + removePart.partNumber, "green");
-				vm.popupHandler.closeAllWindows();
-				vm.queryForInventory();
 			});
 		}
 	}
 	
 	vm.queryForInventory();
+	
 	
 	vm.displayResponse = function (message, color) {
 		vm.responseStyle = {"color" : color}
@@ -203,54 +240,3 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 		vm.popupActionResponse = message;
 	}
 });
-
-
-function PopupHandler () {
-	this.heading = "";
-	this.windowShow = false;
-	this.windowType = ""
-	this.response = "";
-	this.responseStyle = "";
-	this.editPart = {};
-	this.backgroundStyle = {};
-	
-	this.openAddWindow = function () {
-		this.heading = "Add Parts to Inventory";
-		this.windowShow = true;
-		this.windowType = "add";
-	};
-	
-	this.openSubtractWindow = function () {
-		this.heading = "Subtract Parts from Inventory";
-		this.windowShow = true;
-		this.windowType = "subtract";
-	};
-	
-	this.openEditWindow = function () {
-		this.heading = "Edit a Part";
-		this.windowShow = true;
-		this.windowType = "edit";
-	};
-	
-	this.openRemoveWindow = function () {
-		this.heading = "Remove Part";
-		this.windowShow = true;
-		this.windowType = "remove";
-	};
-	
-	this.closeAllWindows = function () {
-		this.windowShow = false;
-		this.windowType = "";
-		this.setResponse ("", "");
-		this.backgroundStyle = {};
-	};
-	
-	this.getChildren = function () {
-		return this.editPart.children;
-	}
-	
-	this.setResponse = function (message, color ) {
-		this.responseStyle = {"color" : color};
-		this.response = message;
-	}
-}

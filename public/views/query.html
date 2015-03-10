@@ -1,128 +1,90 @@
 <div class = "container" ng-controller = "QueryController as main">
+	<h1 ng-style = "main.popupHandler.backgroundStyle">{{main.title}}</h1>
 	<p class = "viewResponse" ng-style = "main.responseStyle">{{main.actionResponse}}</p>
-	<h1 ng-style = "main.containerStyle">{{main.title}}</h1>
 	
-	<div class = "addPopupWindow" ng-show = "main.addWindowShow">
-		<h2>Edit Part</h1>
-		<p class = "viewResponse" ng-style = "main.popupResponseStyle">{{main.popupActionResponse}}</p>
+	<div class = "popupWindow" ng-show = "main.popupHandler.windowShow">
+		<h2>{{main.popupHandler.heading}} - {{main.popupHandler.editPart.partNumber}}</h1>
+		<p class = "viewResponse" ng-style = "main.popupHandler.responseStyle">{{main.popupHandler.response}}</p>
 		<hr/>
-		<form name="editForm" class="form-horizontal">
+		<form name="editForm" class="form-horizontal" novalidate>
+			<!--  Main form elements (ID and description) -->
 			<div class="form-group">
 				<label for="addPartNumber" class="col-sm-3 control-label">Part ID</label>
 				<div class="col-sm-8">
-					<input type="text" class="form-control input-sm" id="addPartNumber" ng-model="addPartNumber" ng-disabled = "true" required />
+					<input type="text" class="form-control input-sm" id="popupPartNumber" ng-model="popupPartNumber" ng-disabled = "true" />
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="addDescription" class="col-sm-3 control-label">Description</label>
 				<div class="col-sm-8">
-					<input type="text" class="form-control input-sm" id="addDescription" ng-model="addDescription" ng-disabled = "true" required />
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="addQuantity" class="col-sm-3 control-label"># Parts to Add</label>
-				<div class="col-sm-2">
-					<input type="text" class="form-control input-sm" id="addQuantity" ng-model="addQuantity" required />
+					<input type="text" class="form-control input-sm" id="popupDescription" ng-model="popupDescription" ng-disabled = "main.popupHandler.windowType != 'edit'" />
 				</div>
 			</div>
 			
-			<div class = "row" ng-show = "main.addChildren.length > 0">
-				<div class="col-md-12">
-					<h4>Children Parts</h4>
+			<!--  Popup elements for adding parts -->
+			<div class="form-group" ng-show = "main.popupHandler.windowType == 'add'">
+				<label for="popupQuantity" class="col-sm-3 control-label"># Parts to Add</label>
+				<div class="col-sm-2">
+					<input type="text" class="form-control input-sm" id="popupQuantity" ng-model="popupQuantity" />
 				</div>
 			</div>
-			<div class="row" ng-show = "main.addChildren.length > 0">
+			
+			<!--  Popup elements for editing parts -->
+			<div class="form-group" ng-show = "main.popupHandler.windowType == 'edit'">
+				<div ng-show = "main.popupHandler.getChildren().length == 0">
+					<label for="popupCost" class="col-sm-3 control-label">Cost</label>
+					<div class="col-sm-2">
+						<input type="text" class="form-control input-sm" id="popupCost" ng-model="popupCost" />
+					</div>
+				</div>
+			</div>
+			
+			<!--  Popup elements for subtracting parts -->
+			<div class="form-group" ng-show = "main.popupHandler.windowType == 'subtract'">
+				<label for="popupQuantity" class="col-sm-3 control-label"># Parts to Remove</label>
+				<div class="col-sm-2">
+					<input type="text" class="form-control input-sm" id="popupQuantity" ng-model="popupQuantity"/>
+				</div>
+				<label for="popupQuantity" class="col-sm-3 control-label">Parts Remaining</label>
+				<label for="popupQuantity" class="col-sm-3 control-label">{{main.popupHandler.editPart.quantity - popupQuantity}}</label>
+			</div>
+			
+			<!--  popup child part display -->
+			<div class="row" ng-show = "main.popupHandler.getChildren().length > 0">
 				<div class="col-md-12">
 					<table class="table table-striped table-bordered">
 						<thead>
 							<tr>
 								<th class = "partRow">Child Part Number</th>
 								<th class = "partRow">Child Parts per Unit</th>
-								<th class = "partRow">Child Parts to be Used</th>
+								<th class = "partRow" ng-show = "main.popupHandler.windowType == 'add'">Child Parts to be Used</th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="item in main.addChildren">
+							<tr ng-repeat="item in main.popupHandler.getChildren()">
 								<td class = "partRow">{{item.partNumber}}</td>
 								<td class = "partRow">{{item.ppi}}</td>
-								<td class = "partRow danger">{{item.ppi * addQuantity}}</td>
+								<td class = "partRow danger" ng-show = "main.popupHandler.windowType == 'add'">{{item.ppi * popupQuantity}}</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 			</div>
 			<div class = "row">
-				<div class="col-sm-2">
-					<button class="btn btn-success queryEditPart" ng-click= "main.addParts()">Confirm Edit</button>
+				<div class="col-sm-9">
+					<button class="btn btn-success queryCancelEdit pull-right" ng-click= "main.popupHandler.closeAllWindows()">Cancel</button>
 				</div>
 				<div class="col-sm-2">
-					<button class="btn btn-success queryCancelEdit" ng-click= "main.closePopupWindow()">Cancel</button>
+					<button class="btn btn-success queryEditPart pull-right" ng-show = "main.popupHandler.windowType == 'add'" ng-click= "main.addParts()">Add</button>
+					<button class="btn btn-success queryEditPart pull-right" ng-show = "main.popupHandler.windowType == 'subtract'" ng-click= "main.subtractParts()">Remove</button>
+					<button class="btn btn-success queryEditPart pull-right" ng-show = "main.popupHandler.windowType == 'edit'" ng-click= "main.editPart()">Edit</button>
+					<button class="btn btn-success queryEditPart pull-right" ng-show = "main.popupHandler.windowType == 'remove'" ng-click= "main.removePart()">Remove</button>
 				</div>
 			</div>
 		</form>
 	</div>
 	
-	<div class = "editPopupWindow" ng-show = "main.editWindowShow">
-		<h2>Edit Part</h1>
-		<form name="editForm" class="form">
-			<!--  Main form row.  Contains inputs for part number and a description -->
-			<div class="row">
-				<!-- Part Number Field -->
-				<div class = "col-sm-4">
-					<div class="form-group">
-						<label>Part Number</label>
-						<input type="text" class="form-control" ng-model="oldPartNumber" ng-disabled = "true" required />
-					</div>
-				</div>
-				
-				<!-- Part Description Field -->
-				<div class = "col-sm-8">
-					<div class="form-group">
-						<label>Part Description</label>
-						<input type="text" class="form-control" ng-model="oldDescription" required />
-					</div>
-				</div>
-			</div>
-			
-			<div class = "row" ng-show = "main.editChildren.length > 0">
-				<div class="col-md-12">
-					<h4>Children Parts</h4>
-				</div>
-			</div>
-			<div class = "row" ng-show = "main.editChildren.length > 0">
-				<div class="col-md-12">
-					<table class="table table-striped">
-						<tbody>
-							<tr>
-								<th class = "partRow">Child Part Number</th>
-								<th class = "partRow">Description</th>
-								<th class = "partRow">Parts per Unit</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="child in main.editChildren">
-								<td class = "partRow">{{child.partNumber}}</td>
-								<td class = "partRow col-md-4">{{child.desc}}</td>
-								<td class = "partRow">{{child.ppi}}</td>
-							</tr>
-					</tbody>
-					</table>
-				</div>
-			</div>
-			
-			<hr/>
-			<div class = "row">
-				<div class="col-sm-2">
-					<button class="btn btn-success queryEditPart" ng-click= "main.editPart()">Confirm Edit</button>
-				</div>
-				<div class="col-sm-2">
-					<button class="btn btn-success queryCancelEdit" ng-click= "main.closePopupWindow()">Cancel</button>
-				</div>
-			</div>
-		</form>
-	</div>
-	
-	<div class = "col-sm-3 queryBackground" ng-style = "main.containerStyle">
+	<div class = "col-sm-3 queryBackground" ng-style = "main.popupHandler.backgroundStyle">
 		<h3>Item Search</h3>
 		<div class="input-group">
 			<span class="input-group-addon">
@@ -136,13 +98,11 @@
 		</div>
 		<br/><br/>
 		<div>
-			<p>
-				Search for a part number using the search box.  Click a part row to show the part makeup.
-			</p>
+			<p>Search for a part number using the search box.  Click a part row to show the part makeup.</p>
 		</div>
 	</div>
 	
-	<div class="col-md-9 queryBackground"  ng-style = "main.containerStyle">
+	<div class="col-md-9 queryBackground pull-right"  ng-style = "main.popupHandler.backgroundStyle">
 		<table class="table table-striped table-bordered">
 			<thead>
 				<tr>
@@ -164,10 +124,10 @@
 					<td class = "partRow">{{item.uom}}</td>
 					<td class = "partRow">{{item.children.length}}</td>
 					<td class = "partRow">
-						<span class="badge editBadge subtractIcon anchor" ng-click = "main.openEditWindow(item)"><p class="message">Subtract quantity</p></span>
+						<span class="badge editBadge subtractIcon anchor" ng-click = "main.openSubtractWindow(item)"><p class="message">Subtract quantity</p></span>
 						<span class="badge editBadge addIcon anchor" ng-click = "main.openAddWindow(item)"><p class="message">Add quantity</p></span>
 						<span class="badge editBadge infoIcon anchor" ng-click = "main.openEditWindow(item)"><p class="message">View/edit part information</p></span>
-						<span class="badge editBadge removeIcon anchor" ng-click = "main.removePart(item)"><p class="message">Remove part</p></span>
+						<span class="badge editBadge removeIcon anchor" ng-click = "main.openRemoveWindow(item)"><p class="message">Remove part</p></span>
 					</td>
 				</tr>
 			</tbody>

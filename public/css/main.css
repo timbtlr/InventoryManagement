@@ -2,6 +2,10 @@
     padding : 0px;
 }
 
+.navbar-fixed-top {
+	background-color: #303030;
+}
+
 .nav a {
 	color: white;
 	font-size: 11px;
@@ -12,7 +16,6 @@
 
 .nav li {
 	display: inline;
-	background-color: black;
     border-radius: 5px;
 }
 
@@ -63,7 +66,6 @@
 	font-weight: normal;
 }
 
-::-webkit-scrollbar { display:none }
 
 .list-group {
     height: 500px;
@@ -106,14 +108,26 @@ select.input-sm {
 	z-index: 1;
 }
 
-.editPopupWindow, .addPopupWindow {
-	position: absolute;
-	top: 210px;
+.popupWindow{
+	position: fixed;
 	width: 675px;
-	left: 350px;
+	top: 210px;
+	left: 425px;
 	padding: 20px;
 	z-index: 2;
 	background-color: #DADADA;
+	border: 2px solid;
+    border-radius: 25px;
+}
+
+
+.querySearch{
+	position: fixed;
+	width: 275px;
+	height: 275px;
+	top: 350px;
+	left: 130px;
+	padding: 20px;
 	border: 2px solid;
     border-radius: 25px;
 }
@@ -147,7 +161,6 @@ select.input-sm {
 .editBadge {
 	position: relative;
 	top: 1px;
-	background-image:url("../img/add.png");
     background-repeat: no-repeat;
     background-size: 17px;
 	background-color: white;

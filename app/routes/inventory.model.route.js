@@ -49,11 +49,11 @@ module.exports = function(router) {
 					res.send(err);
 				} else {
 					//  Alter existing part properties
+					inventory.cost = req.body.cost.toFixed(2);
 					inventory.desc = req.body.desc;
-					inventory.quantity = req.body.quantity;
+					inventory.quantity = inventory.quantity + req.body.quantity;
 					inventory.uom = req.body.uom;
-					inventory.cost = req.body.cost;
-					inventory.children = req.body.children;
+					inventory.children = req.body.children;					
 	
 					//  Save the updated part
 					inventory.save(function(err) {
