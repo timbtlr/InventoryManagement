@@ -140,6 +140,7 @@ angular.module('AddCtrl', []).controller('AddController', function($scope, $wind
 			//  Query to inventory to determine if the part already exists
 			databaseServiceFactory.getOne($scope.newPartNumber).then(function(result) {
 				if (result.data != null) {
+					console.log(result.data);
 					//  The part exists already.  Alert the user.
 					vm.displayResponse ("Part number \"" + $scope.newPartNumber + "\" exists in the inventory already", "red");
 				} else {

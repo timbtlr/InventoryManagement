@@ -14,17 +14,24 @@ app.use(methodOverride('X-HTTP-Method-Override'));
 app.use(express.static(__dirname + '/public')); 
 
 // CONFIGURATION ===========================================
-mongoose.connect(db.url);  //  mongoDB database 
+
+// connect to our mongoDB database 
+mongoose.connect(db.url);  //  mongoDB database  
 
 // ROUTES ==================================================
 var router = express.Router();         
 require('./app/routes/inventory.model.route')(router); // configure routes for the inventory model
-require('./app/routes/routes')(app); // configure our routes
 app.use('/api', router);
 
+require('./app/routes/routes')(app); // configure our routes
+
+// set the static files location /public/img will be /img for users
+
 // START APPLICATION =====================================
+// startup our app at http://localhost:8080
 var port = process.env.PORT || 8080; 
-app.listen(port);  //Listening on 8080               
+app.listen(port);               
+console.log('Use port ' + port + ' to connect to this server');
 
 // expose app           
 exports = module.exports = app; 
