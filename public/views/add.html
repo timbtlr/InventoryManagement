@@ -2,7 +2,6 @@
 	<div class = "container">
 		<h1>Add New Inventory Part</h1>
 		<p class = "viewResponse" ng-style = "main.responseStyle">{{main.actionResponse}}</p>
-		<div class="clearfix"></div>
 		
 		<form name="addForm" class="form">
 			<!--  Main form row.  Contains inputs for part number and a description -->
@@ -78,11 +77,11 @@
 				
 				<!-- Button to add a child to the current part -->
 				<div class="col-sm-3">
-					<button class="btn btn-primary pull-right addChildButton" ng-click="main.addChildToPart(newChildrenSelect, newPpi)" ng-disabled = "main.parts.length == 0">Add Child to Part</button>
+					<button class="btn btn-default pull-right addChildButton" ng-click="main.addChildToPart(newChildrenSelect, newPpi)" ng-disabled = "main.parts.length == 0">Add Child to Part</button>
 				</div>
 			</div>
 			
-			
+			<!-- Child part listing.  A row is added here for each children appended to the current part entry. -->
 			<div class="row" ng-show = "main.childrenToAdd.length > 0">
 				<div class="col-md-9">
 					<table class="table table-striped table-bordered">
@@ -110,7 +109,7 @@
 			
 			<hr/>
 			
-			<!--  Contains the checkbox to indicate inclusion of child parts and the button to add the new part to the inventory. -->
+			<!--  Clear and confirm buttons -->
 			<div class="row">
 				<div class="col-sm-7">
 					<button class="btn btn-danger pull-Right" ng-click= "main.clearFields()">Clear All</button>

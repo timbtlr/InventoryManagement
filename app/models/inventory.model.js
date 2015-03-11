@@ -8,11 +8,13 @@ Description:
     making up a full inventory list.
     
     The inventory document has the following fields:
-        - name:     Human readable/understandable name of a specific item
-        - id:       Unique item identifier
-        - desc:     Description string for the item
-        - children: Array of item identifiers making up the item.  
-                    Each entry in the array contains an ID and quantity.
+        - partNumber:	Unique part identifier of a specific item
+        - desc:     	Description string for the item
+		- quantity:		Number of parts for this partNumber in the inventory
+		- uom:			Unit of part measurement
+		- cost:			Cost per part unit
+        - children: 	Array of item identifiers making up the item.  
+						Each entry in the array contains an ID and PPI value (parts per item).
 
 Author:
     Tim "KetsuN" Butler

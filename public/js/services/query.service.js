@@ -4,7 +4,7 @@ Name:
 	
 Description:
 	Provides a service for the Query functionality of the Inventory Management application.
-	The service requests actions from server APIs to query for information from the mongoDB.
+	The service requests HTTP actions from server APIs to query for information from the mongoDB.
 	
 Author:
 	Tim "KetsuN" Butler

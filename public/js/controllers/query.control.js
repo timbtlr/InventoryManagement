@@ -30,22 +30,31 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
     var vm = this;
     vm.title = "Current Inventory on File";
     vm.searchInput = '';
-	vm.badgeShow = true;
-	
 	vm.popupHandler = new PopupHandler ();
-	vm.popupHandler.backgroundStyle = {};
-	vm.editChildren = []
 	
+	//  Unit of Measurement options
 	vm.uomOptions = globalServiceFactory.getGlobalVars().uomOptions;
 	
-	//  Ordering definitions for database results
+	//  Part ordering options
 	vm.orders = globalServiceFactory.getGlobalVars().searchOrders;
 	vm.order = vm.orders[0];
 	
 	//  Retrieve all inventory results from the database
 	vm.parts = [];
 	
+	/*
+	Function name:
+		queryForInventory
+		
+	Description:
+		Queries for all inventory parts from the inventory database.
+		
+	Parameters:
+		None
 	
+	Author:
+		Tim "KetsuN" Butler
+	*/
 	vm.queryForInventory = function () {
 		databaseServiceFactory.get().then(function(result) {
 			vm.parts = result.data;
@@ -53,6 +62,19 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 	}
 	
 	
+	/*
+	Function name:
+		openAddWindow
+		
+	Description:
+		Signals the popup handler object to open a popup window for an add quantity request.
+		
+	Parameters:
+		part	- Part to be edited.  It's attributes will be filled into the popup elements.
+	
+	Author:
+		Tim "KetsuN" Butler
+	*/
 	vm.openAddWindow = function (part) {
 		vm.popupHandler.backgroundStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
 		vm.popupHandler.openAddWindow();
@@ -64,6 +86,19 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 	}
 	
 	
+	/*
+	Function name:
+		openSubtractWindow
+		
+	Description:
+		Signals the popup handler object to open a popup window for a subtract quantity request.
+		
+	Parameters:
+		part	- Part to be edited.  It's attributes will be filled into the popup elements.
+	
+	Author:
+		Tim "KetsuN" Butler
+	*/
 	vm.openSubtractWindow = function (part) {
 		vm.popupHandler.backgroundStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
 		vm.popupHandler.openSubtractWindow();
@@ -75,6 +110,19 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 	}
 	
 	
+	/*
+	Function name:
+		openEditWindow
+		
+	Description:
+		Signals the popup handler object to open a popup window for an edit part request.
+		
+	Parameters:
+		part	- Part to be edited.  It's attributes will be filled into the popup elements.
+	
+	Author:
+		Tim "KetsuN" Butler
+	*/
 	vm.openEditWindow = function (part) {
 		vm.popupHandler.backgroundStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
 		vm.popupHandler.openEditWindow();
@@ -85,6 +133,19 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 	}
 	
 	
+	/*
+	Function name:
+		openRemoveWindow
+		
+	Description:
+		Signals the popup handler object to open a popup window to confirm a part removal request.
+		
+	Parameters:
+		part	- Part to be edited.  It's attributes will be filled into the popup elements.
+	
+	Author:
+		Tim "KetsuN" Butler
+	*/
 	vm.openRemoveWindow = function (part) {
 		vm.popupHandler.backgroundStyle = {'opacity': '0.4', 'filter': 'alpha(opacity=40)'};
 		vm.popupHandler.openRemoveWindow();
@@ -95,6 +156,20 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 	}
 	
 	
+	/*
+	Function name:
+		removePart
+		
+	Description:
+		Removes the part currently loaded into the popupHandler.  If the part removal is successful
+		then the popup window is closed and the user is alerted with success.
+		
+	Parameters:
+		None
+	
+	Author:
+		Tim "KetsuN" Butler
+	*/
 	vm.removePart = function () {
 		databaseServiceFactory.remove(vm.popupHandler.editPart.partNumber).then(function(result) { 
 			vm.popupHandler.closeAllWindows();
@@ -103,28 +178,70 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 		});;
 	}
 	
-	vm.editPart = function (part) {
+	
+	/*
+	Function name:
+		editPart
+		
+	Description:
+		Edits the part currently loaded into the popupHandler.  The description and part cost
+		values are updated in the inventory database.  Those fields in the popup are verified
+		for correctness before editing.  
+		
+	Parameters:
+		None
+	
+	Author:
+		Tim "KetsuN" Butler
+	*/
+	vm.editPart = function () {
+		//  Verify editing inputs
 		if (typeof($scope.popupDescription) == "undefined") {
-			vm.popupHandler.setResponse ("Invalid Description  --  required", "red");;
+			vm.popupHandler.setResponse ("Invalid Description  --  required", "red");
 		} else if ((typeof($scope.popupCost) == "undefined") || isNaN($scope.popupCost)) {
-			vm.popupHandler.setResponse ("Invalid Cost  --  required number", "red");;
+			vm.popupHandler.setResponse ("Invalid Cost  --  required number", "red");
 		} else {
+			//  Edit description and cost fields of the editing part.
 			vm.popupHandler.editPart.desc = $scope.popupDescription;
 			vm.popupHandler.editPart.cost = $scope.popupCost;
 			
-			databaseServiceFactory.edit(vm.popupHandler.editPart);
-			
-			vm.popupHandler.closeAllWindows();
-			vm.popupHandler.backgroundStyle = {};
-			vm.queryForInventory();
+			//  
+			addServiceFactory.edit(vm.popupHandler.editPart).then(function(result) { 
+				vm.popupHandler.closeAllWindows();
+				vm.popupHandler.backgroundStyle = {};
+				vm.queryForInventory();
+			});
 		}
 	}
 	
 	
+	/*
+	Function name:
+		addParts
+		
+	Description:
+		Adds quantity to the part currently loaded into the popupHandler.  The quantity
+		value is updated in the inventory database.  Quantity is removed from each child
+		related to the part based on the PPI value of the child.  If a child does not have
+		enough quantity to remove then the user is alerted of the problem. 
+		
+		Child quantities are queried from the inventory before performing any updates.
+		This could be done from the apps current understanding of the inventory,
+		but querying from the database better ensures that there is no lapse in 
+		inventory integrity/correctness.
+		
+	Parameters:
+		None
+	
+	Author:
+		Tim "KetsuN" Butler
+	*/
 	vm.addParts = function () {
+		//  Verify quantity input
 		if ((typeof($scope.popupQuantity) == "undefined") || isNaN($scope.popupQuantity)) {
 			vm.popupHandler.setResponse ("Invalid # Parts to Add  --  required number", "red");;
 		} else {
+			//  Prepare a child part number array
 			var idArray = []
 			var part = vm.popupHandler.editPart;
 			part.quantity = Number($scope.popupQuantity);
@@ -133,20 +250,23 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 				idArray.push(part.children[i].partNumber);
 			}
 			
+			//  Search for the quantities of children from the inventory database
 			databaseServiceFactory.getByArray(idArray).then(function(result) {
 				results = result.data;
 				
+				//  Determine if any of the children do not have sufficient parts to remove.  Alert if insufficient.
 				for (var i = 0; i < part.children.length; i ++) {
 					for (var j = 0; j < results.length; j ++) {
 						if ((part.children[i].partNumber == results[j].partNumber) && ((part.children[i].ppi * $scope.popupQuantity) > results[j].quantity)) {
-							vm.popupResponse ("Not enough children parts to make " + $scope.popupQuantity + " parts." , "red");
+							vm.popupHandler.setResponse ("Not enough children parts to make " + $scope.popupQuantity + " parts." , "red");
 							return;
 						}
 					}
 				}
 				
-				//  Add the formatted part to the inventory
+				//  Add update the quantity of the part.  
 				queryServiceFactory.edit(part).then(function(result) {
+					//  Iterate through all children parts and remove the appropriate quantity from each (based on PPI).
 					for (var i = 0; i < part.children.length; i ++) {
 						var removePart = {partNumber: part.children[i].partNumber,
 										  subtract: (part.children[i].ppi * $scope.popupQuantity)}
@@ -155,33 +275,42 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 						databaseServiceFactory.subtractFromPart(removePart).then(function(result) { });
 					}
 					
-					//  Display response for the user
+					//  Display response for the user, close popup window, update inventory for view
 					vm.displayResponse ($scope.popupQuantity + " quantity added to " + $scope.popupPartNumber, "green");
 					vm.popupHandler.closeAllWindows();
-					
-					getPartArray (databaseServiceFactory, function (currentParts) {
-						vm.parts = currentParts;
-						$scope.newChildrenSelect = vm.parts[0];
-						vm.queryForInventory();
-					});
+					vm.queryForInventory();
 				});
 			});
 		}
-		
 	}
 	
 	
+	/*
+	Function name:
+		subtractParts
+		
+	Description:
+		Removes quantity from the part currently loaded into the popupHandler.  The quantity
+		value is updated in the inventory database.  
+		
+	Parameters:
+		None
 	
-	vm.subtractParts = function (part) {
+	Author:
+		Tim "KetsuN" Butler
+	*/
+	vm.subtractParts = function () {
+		//  Verify quantity input
 		if ((typeof($scope.popupQuantity) == "undefined") || isNaN($scope.popupQuantity)) {
 			vm.popupHandler.setResponse ("Invalid # Parts to Remove  --  required number", "red");
 		} else if ($scope.popupQuantity > vm.popupHandler.editPart.quantity) {
 			vm.popupHandler.setResponse ("Cannot remove more quantity than the inventory contains", "red");
 		} else {
+			//  Format a JSON object for the part removal
 			var removePart = {partNumber: vm.popupHandler.editPart.partNumber,
 							  subtract: $scope.popupQuantity};
 						
-			//  Add the formatted part to the inventory
+			//  Subtract quantity from the inventory, alert user, update inventory for view
 			databaseServiceFactory.subtractFromPart(removePart).then(function(result) { 
 				vm.displayResponse(removePart.subtract + " quantity removed from " + removePart.partNumber, "green");
 				vm.popupHandler.closeAllWindows();
@@ -190,21 +319,44 @@ angular.module('QueryCtrl', []).controller('QueryController', function($scope, g
 		}
 	}
 	
-	vm.queryForInventory();
 	
+	/*
+	Function name:
+		displayResponse
+		
+	Description:
+		Displays a response to the user on the view.
+		
+	Parameters:
+		message	-	String to be displayed for the user
+		color	-	Color of the message to be displayed
+	
+	Author:
+		Tim "KetsuN" Butler
+	*/
 	vm.displayResponse = function (message, color) {
 		vm.responseStyle = {"color" : color}
 		vm.actionResponse = message;
 	}
 	
 	
-	vm.popupResponse = function (message, color) {
-		vm.popupResponseStyle = {"color" : color}
-		vm.popupActionResponse = message;
-	}
+	//  Initial inventory query for all parts
+	vm.queryForInventory();
 });
 
 
+	
+	
+/*
+Class name:
+	PopupHandler
+	
+Description:
+	Contains options used for a query popup window.  Helps to control the query view through directives.
+
+Author:
+	Tim "KetsuN" Butler
+*/
 function PopupHandler () {
 	this.heading = "";
 	this.windowShow = false;

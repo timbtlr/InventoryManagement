@@ -1,4 +1,5 @@
+//  Database configuration
 module.exports = {
-	//  Mongo Database connection string
-	url : 'mongodb://localhost/inventoryDb'
+	//  Connection string
+	url : 'mongodb://invenuser:invenpassword@ds045021.mongolab.com:45021/inventory'
 }
